@@ -7,7 +7,7 @@ function res = resource_validation(tresource,resource,t_instant)
     [row,column] = size(ini);
     arrow = ini(column-1); 
     
-    if t_instant<resource(2,arrow)
+    if t_instant<resource(2,arrow) 
         t_nextgap = resource(1,arrow+1)-resource(2,arrow);
         if t_nextgap<tresource
          res(2,arrow)= res(2,arrow+1);
@@ -39,18 +39,31 @@ function res = resource_validation(tresource,resource,t_instant)
         end
     end 
    
-   % per aqui...
+   % If the tresource is still not zero.
     while tresource>0
         arrow=arrow+1;
         t_nextgap = resource(1,arrow+1)-resource(2,arrow);
         
         if t_nextgap<tresource && arrow ~= (column-1)
-         tresource=tresource-tgap;
+             tresource=tresource-tgap;
+             res(2,arrow)=res(2,arrow+1);
+        elseif t_nextgap==tresource && arrow ~= (column-1)
+              res(2,arrow)=res(2,arrow+1);
+              tresource=0;
         else
-         tresource=0;
+              res(2,arrow)=res(2,arrow)+tresource;
+              tresource=0;
         end
     end
     
-    % petar els t invalids...
+    % clean outdated columns
+    for i=1:(size(res)-1)
+        if res(1,i+1)<res(2,i) && res(2,i+1)<=res(2,i)
+            res(:,i+1)=[];
+        elseif (res(1,i+1)<res(2,i) && res(2,i+1)>res(2,i)) || res(1,i+1)==res(2,i) 
+            res(2,i)=res(2,i+1);
+            res(:,i+1)=[];
+        end
+    end
 
 end

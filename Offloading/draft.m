@@ -42,8 +42,20 @@
 % 
 % disp(A);
 % 
-res = [1,2,3,4,5,6;1,2,3,4,5,6];
-intro = [19;20];
-arrow = 2;
-res = [res(:,1:arrow), intro, res(:,arrow+1:end)];
-disp(res);
+
+
+% res = [1,2,3,4,5,6;1,2,3,4,5,6];
+% intro = [19;20];
+% arrow = 2;
+% res = [res(:,1:arrow), intro, res(:,arrow+1:end)];
+% disp(res);
+
+
+
+A = [ 1 2 3
+       3 5 9
+       1 8 0
+       2 3 3 ]
+disp(size(A));
+A(:,2)=[]
+disp(size(A));

@@ -28,7 +28,7 @@ function twait = vm_hold(tcalc,vm, t_vm_arrival)
     while tcalc>0
         arrow=arrow+1;
         if arrow == column
-            twait= inf;
+            thold= inf;
             break;
         end
         t_nextgap = vm(1,arrow+1)-vm(2,arrow);

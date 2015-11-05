@@ -140,20 +140,48 @@ count = 0;
                 t_resourceDL = bits/R_DL(who_user,poss(j,1));
                 t5 = t_instant;
                 tw_DL = resource_availability(t_resourceDL,aps{2},t_instant);
-
-                t_total= t_resourceUL+tw_UL+t_resourceBUL+tw_BUL+tp_vm+t_resourceBDL+tw_BDL+t_resourceDL+tw_DL;
+                 t_total= t_resourceUL+tw_UL+t_resourceBUL+tw_BUL+tp_vm+t_resourceBDL+tw_BDL+t_resourceDL+tw_DL;
                 
 % an other consideration, ap routing t_wait = 0 ;
                  
-                if t_total<=t_threshold 
-                   % Success! => Validation
+                if t_total<=t_threshold
+		   
+		   fprintf('SUCCESS!!!');
+ 		   fprintf('The user ',who_user,' has offloaded using AP ',poss(j,1),' and VM ',poss(j,2),'.');
+                   fprintf('The resources were in these states before the user offloaded...');
+                   
+		   fprintf('UL resource', poss(j,1));
+		   disp(aps_timedivision{poss(j,1),1});
+		   fprintf('BUL resource', poss(j,2));
+		   disp(aps_timedivision{poss(j,2),1});
+                   fprintf('VM resource', poss(j,2));
+                   disp(vms_calc{poss(j,2)});
+		   fprintf('BDL resource', poss(j,2));
+                   disp(aps_timedivision{poss(j,2),2});
+                   fprintf('DL resource', poss(j,1));
+		   disp(aps_timedivision{poss(j,1),2});	 
+		   
+		   % Success!=> Validation
                    aps_timedivision{poss(j,1),1} = resource_validation(t_resourceUL,aps{1},t1);
                    vms_timedivision{poss(j,2),1} = resource_validation(t_resourceBUL,vms{1},t2);
                    vms_calc{poss(j,2)}= resource_validation(vms_calc{poss(j,2)},bits,t3); 
                    vms_timedivision{poss(j,2),2} = resource_validation(t_resourceBDL,vms{2},t4);
                    aps_timedivision{poss(j,1),2} = resource_validation(t_resourceDL,aps{2},t5);
-                   
-                   break;
+
+                   fprintf('The resources are now in these states after offloading validation...');
+	
+		   fprintf('UL resource', poss(j,1));
+                   disp(aps_timedivision{poss(j,1),1});
+                   fprintf('BUL resource', poss(j,2));
+                   disp(aps_timedivision{poss(j,2),1});
+                   fprintf('VM resource', poss(j,2));
+                   disp(vms_calc{poss(j,2)});
+                   fprintf('BDL resource', poss(j,2));
+                   disp(aps_timedivision{poss(j,2),2});
+                   fprintf('DL resource', poss(j,1));
+                   disp(aps_timedivision{poss(j,1),2});  
+	
+		   break;
                 end 
             end
     end

@@ -148,7 +148,7 @@ count = 0;
 		   
 		   fprintf('SUCCESS!!!');
  		   fprintf('The user ',who_user,' has offloaded using AP ',poss(j,1),' and VM ',poss(j,2),'.');
-                   fprintf('The resources were in these states before the user offloaded...');
+                   fprintf('The resources were in these state before the user offloaded...');
                    
 		   fprintf('UL resource', poss(j,1));
 		   disp(aps_timedivision{poss(j,1),1});
@@ -168,7 +168,7 @@ count = 0;
                    vms_timedivision{poss(j,2),2} = resource_validation(t_resourceBDL,vms{2},t4);
                    aps_timedivision{poss(j,1),2} = resource_validation(t_resourceDL,aps{2},t5);
 
-                   fprintf('The resources are now in these states after offloading validation...');
+                   fprintf('The resources are now in these state after offloading validation...');
 	
 		   fprintf('UL resource', poss(j,1));
                    disp(aps_timedivision{poss(j,1),1});
@@ -180,7 +180,26 @@ count = 0;
                    disp(aps_timedivision{poss(j,2),2});
                    fprintf('DL resource', poss(j,1));
                    disp(aps_timedivision{poss(j,1),2});  
-	
+		   	
+		   fprintf('Check the variables used by the Offload manager:');
+		   
+	           fprintf('t_resourceUL: ',t_resourceUL);
+		   fprintf('tw_UL: ',tw_UL);
+		   fprintf('t_resourceBUL: ', t_resourceBUL);
+		   fprintf('tw_BUL: ', tw_BUL);
+		   fprintf('tp_vm: ', tp_vm);
+		   fprintf('t_resourceBDL: ',t_resourceBDL);
+	           fprintf('tw_BDL: ',tw_BDL);
+		   fprintf('t_resourceDL: ',t_resourceDL);
+		   fprintf('tw_DL: ',tw_DL);
+
+		   fprintf('FINAL RESULT');
+		   fprintf('Time needed:');
+		   disp(t_total);
+		   fprintf('Energy needed:');
+		   e = poss(j,3) * bits;
+		   disp(e);
+				
 		   break;
                 end 
             end

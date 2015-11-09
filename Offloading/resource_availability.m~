@@ -16,11 +16,8 @@ function twait = resource_availability(tresource,resource,t_instant)
     [l1,m1] = size(ini1);
     [l2,m2] = size(ini2);
    
-    if m==1 
-        twait=0;
-        return;
-    elseif m1==1
-        arrow = 1;
+    if m1==1 
+        arrow = ini1(1,1); %first access 
     else
         arrow = ini1(1,m1-1);
     end

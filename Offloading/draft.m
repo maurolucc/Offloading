@@ -52,10 +52,30 @@
 
 
 
-A = [ 1 2 3
-       3 5 9
-       1 8 0
-       2 3 3 ]
-disp(size(A));
-A(:,2)=[]
-disp(size(A));
+% A = [21 22 23 24 25 26 27 0];
+% disp(A);
+% ini = find(23.4>A);
+% disp(ini);
+% [l, m] = size(ini);
+% arrow = ini(1,m-1);
+% disp(arrow);
+% 
+% aps = {};
+% aps{1,1} = [1 1;1 1];
+% aps{1,2} = [1 1;2 2];
+% aps{2,1} = [2 2;1 1];
+% aps{2,2} = [2 2;2 2];
+% 
+% disp(aps{2,2});
+
+res = [22 55 58 0;30 56 89 0];
+row = res(1,:);
+disp(row);
+ini = find(57>row);
+disp(ini);
+[l,m] = size(ini);
+disp(m);
+
+        arrow = ini(1,m-1);
+   
+disp(arrow,'hola');

@@ -14,26 +14,26 @@ M = input(prompt2);
 
 R_UL = randi([1 16],K,N); 
 R_UL = rates_assignment(R_UL);
-disp('Access rates uplink:');
-disp(R_UL);
+% disp('Access rates uplink:');
+% disp(R_UL);
 R_DL= randi([1 16],K,N); 
 R_DL = rates_assignment(R_DL);
-disp('Access rates downlink:');
-disp(R_DL);
+% disp('Access rates downlink:');
+% disp(R_DL);
 
 technologies = randi([1 6],N,M);
 
 RB_UL = rates_Bassignment(technologies); 
-disp('Backhaul rates uplink:');
-disp(RB_UL);
+% disp('Backhaul rates uplink:');
+% disp(RB_UL);
 RB_DL = RB_UL; % Considering a symmetric backhaul link
-disp('Backhaul rates downlink:');
-disp(RB_DL);
+% disp('Backhaul rates downlink:');
+% disp(RB_DL);
 
 vms_location = vms_assignment(M);
 latencies = calculate_latency(technologies,vms_location);
-disp('Latency matrix:');
-disp(latencies);
+% disp('Latency matrix:');
+% disp(latencies);
 
 % Generate the connection possibilities for each user
 containter = {};
@@ -65,21 +65,17 @@ tf = 0;
 
 % Access radio channels
 aps_timedivison = {}; % {i} refers to AP i
-for t=1:N
-    ap_timedivision = {}; 
-    ap_timedivision{1} = [ti;tf]; % UL
-    ap_timedivision{2} = [ti;tf]; % DL
-    aps_timedivision{t} = ap_timedivision;
+for t=1:N 
+    aps_timedivision{t,1} = [ti;tf]; % UL
+    aps_timedivision{t,2} = [ti;tf]; % DL
 end    
 
 % Backhaul radio channels and VM availability
 vms_timedivision = {}; % {i} refers to VM i 
 vms_calc = {};         % {i} refers to VM i 
 for s=1:M
-    vm_timedivision = {}; 
-    vms_timedivision{1} = [ti;tf]; % UL
-    vms_timedivision{2} = [ti;tf]; % DL
-    vms_timedivision{s} = vm_timedivision;
+    vms_timedivision{s,1} = [ti;tf]; % UL
+    vms_timedivision{s,2} = [ti;tf]; % DL
     vms_calc{s} = [ti;tf];
 end    
 
@@ -99,108 +95,155 @@ request = event_generator(K,requests,simtime);
 
 count = 0;
 
-    while isEmpty(request)==0
+    while count ~= size(request)
         
         count = count+1;
-        t_threshold = 0; % we could modifify this value depending on a parameter... (e.g. app)
+        t_threshold = 10000000000; % we could modifify this value depending on a parameter... (e.g. app)
         who_user= request(2,count);
         bits= request(3,count);
         poss = container{who_user};
-
+       
             for j=1:size(poss)
                 
                 t_instant = request(1,count); % reset t_instant
-                
-                aps = aps_timedivision{poss(j,1)};
-                vms = vms_timedivision{poss(j,2)};
 
                 t_resourceUL = bits/R_UL(who_user,poss(j,1));
-                tw_UL = resource_availability(t_resourceUL,aps{1},t_instant);
+                tw_UL = resource_availability(t_resourceUL,aps_timedivision{poss(j,1),1},t_instant);
                 t1 = t_instant;
-                    
+                
+%                 disp('tw_UL:');
+%                 disp(tw_UL);
+                
+                
                 t_instant = t_instant + tw_UL + t_resourceUL;
                 t_resourceBUL = bits/RB_UL(poss(j,1),poss(j,2));
                 t2 = t_instant;
-                tw_BUL = resource_availability(t_resourceBUL,vms{1},t_instant);
-
+                tw_BUL = resource_availability(t_resourceBUL,vms_timedivision{poss(j,2),1},t_instant);
+                
+%                 disp('tw_BUL:');
+%                 disp(tw_BUL);
+                
                 t_instant = t_instant + tw_BUL+ t_resourceBUL; 
                 t_vm_arrival= t_instant + latencies(poss(j,1),poss(j,2));
                 t3 = t_vm_arrival;
-                t_VM_resource = bits/rate; % pending to specify rate
-                tw_vm = vm_hold(t_VM_resource,vms_calc{poss(j,2)},t_vm_arrival);
+               % rate = 10;
+               % t_VM_resource = bits/rate; % pending to specify rate
+                t_VM_resource = 4;
+                tw_vm = resource_availability(t_VM_resource,vms_calc{poss(j,2)},t_vm_arrival);
                 tp_vm =  t_VM_resource + tw_vm;
                 %t_vm_arrival: time that arrive last bit to be able to process data
    
+%                 disp('tw_vm:');
+%                 disp(tw_vm);
+%                 
+                
                 t_resourceBDL = bits/RB_DL(poss(j,1),poss(j,2)); 
                 t_instant = t_vm_arrival + tp_vm + latencies(poss(j,1),poss(j,2));
                 t4 = t_instant;
-                tw_BDL = resource_availability(t_resourceBDL,vms{2},t_instant); 
-
+                tw_BDL = resource_availability(t_resourceBDL,vms_timedivision{poss(j,2),2},t_instant); 
+                
+%                 disp('tw_BDL:');
+%                 disp(tw_BDL);
+                
                 t_instant= t_instant + tw_BDL + t_resourceBDL;
                 t_resourceDL = bits/R_DL(who_user,poss(j,1));
                 t5 = t_instant;
-                tw_DL = resource_availability(t_resourceDL,aps{2},t_instant);
-                 t_total= t_resourceUL+tw_UL+t_resourceBUL+tw_BUL+tp_vm+t_resourceBDL+tw_BDL+t_resourceDL+tw_DL;
+                tw_DL = resource_availability(t_resourceDL,aps_timedivision{poss(j,1),2},t_instant);
+                t_total= t_resourceUL+tw_UL+t_resourceBUL+tw_BUL+tp_vm+t_resourceBDL+tw_BDL+t_resourceDL+tw_DL + 2*latencies(poss(j,1),poss(j,2));
                 
+%                 disp('tw_DL:');
+%                 disp(tw_DL);
+                
+        
 % an other consideration, ap routing t_wait = 0 ;
                  
                 if t_total<=t_threshold
 		   
-		   fprintf('SUCCESS!!!');
- 		   fprintf('The user ',who_user,' has offloaded using AP ',poss(j,1),' and VM ',poss(j,2),'.');
-                   fprintf('The resources were in these state before the user offloaded...');
-                   
-		   fprintf('UL resource', poss(j,1));
-		   disp(aps_timedivision{poss(j,1),1});
-		   fprintf('BUL resource', poss(j,2));
-		   disp(aps_timedivision{poss(j,2),1});
-                   fprintf('VM resource', poss(j,2));
-                   disp(vms_calc{poss(j,2)});
-		   fprintf('BDL resource', poss(j,2));
-                   disp(aps_timedivision{poss(j,2),2});
-                   fprintf('DL resource', poss(j,1));
-		   disp(aps_timedivision{poss(j,1),2});	 
-		   
-		   % Success!=> Validation
-                   aps_timedivision{poss(j,1),1} = resource_validation(t_resourceUL,aps{1},t1);
-                   vms_timedivision{poss(j,2),1} = resource_validation(t_resourceBUL,vms{1},t2);
-                   vms_calc{poss(j,2)}= resource_validation(vms_calc{poss(j,2)},bits,t3); 
-                   vms_timedivision{poss(j,2),2} = resource_validation(t_resourceBDL,vms{2},t4);
-                   aps_timedivision{poss(j,1),2} = resource_validation(t_resourceDL,aps{2},t5);
+                   disp('SUCCESS!!!');
+                   disp('The user ');
+                   disp(who_user);
+                   disp(' has offloaded using AP ');
+                   disp(poss(j,1));
+                   disp(' and VM ');
+                   disp(poss(j,2));
+                 
+                   disp('The resources were in these state before the user offloaded...');
 
-                   fprintf('The resources are now in these state after offloading validation...');
-	
-		   fprintf('UL resource', poss(j,1));
+                   disp('UL resource'); 
+                   disp(poss(j,1));
                    disp(aps_timedivision{poss(j,1),1});
-                   fprintf('BUL resource', poss(j,2));
-                   disp(aps_timedivision{poss(j,2),1});
-                   fprintf('VM resource', poss(j,2));
+                   disp('BUL resource');
+                   disp(poss(j,2));
+                   disp(vms_timedivision{poss(j,2),1});
+                   disp('VM resource');
+                   disp(poss(j,2));
                    disp(vms_calc{poss(j,2)});
-                   fprintf('BDL resource', poss(j,2));
-                   disp(aps_timedivision{poss(j,2),2});
-                   fprintf('DL resource', poss(j,1));
-                   disp(aps_timedivision{poss(j,1),2});  
-		   	
-		   fprintf('Check the variables used by the Offload manager:');
+                   disp('BDL resource');
+                   disp(poss(j,2));
+                   disp(vms_timedivision{poss(j,2),2});
+                   disp('DL resource');
+                   disp(poss(j,1));
+                   disp(aps_timedivision{poss(j,1),2});	 
 		   
-	           fprintf('t_resourceUL: ',t_resourceUL);
-		   fprintf('tw_UL: ',tw_UL);
-		   fprintf('t_resourceBUL: ', t_resourceBUL);
-		   fprintf('tw_BUL: ', tw_BUL);
-		   fprintf('tp_vm: ', tp_vm);
-		   fprintf('t_resourceBDL: ',t_resourceBDL);
-	           fprintf('tw_BDL: ',tw_BDL);
-		   fprintf('t_resourceDL: ',t_resourceDL);
-		   fprintf('tw_DL: ',tw_DL);
+                    % Success!=> Validation
+                   aps_timedivision{poss(j,1),1} = resource_validation(t_resourceUL,aps_timedivision{poss(j,1),1},t1);
+                   vms_timedivision{poss(j,2),1} = resource_validation(t_resourceBUL,vms_timedivision{poss(j,2),1},t2);
+                   vms_calc{poss(j,2)}= resource_validation(t_VM_resource,vms_calc{poss(j,2)},t3); 
+                   vms_timedivision{poss(j,2),2} = resource_validation(t_resourceBDL,vms_timedivision{poss(j,2),2},t4);
+                   aps_timedivision{poss(j,1),2} = resource_validation(t_resourceDL,aps_timedivision{poss(j,1),2},t5);
+                  
+                    
+                   disp('The user arrived at :');
+                   disp(request(1,count));
+                   disp('The resources are now in these state after offloading validation...');
+               
+                   disp('UL resource'); 
+                   disp(poss(j,1));
+                   disp(aps_timedivision{poss(j,1),1});
+                   disp('BUL resource');
+                   disp(poss(j,2));
+                   disp(vms_timedivision{poss(j,2),1});
+                   disp('VM resource');
+                   disp(poss(j,2));
+                   disp(vms_calc{poss(j,2)});
+                   disp('BDL resource');
+                   disp(poss(j,2));
+                   disp(vms_timedivision{poss(j,2),2});
+                   disp('DL resource');
+                   disp(poss(j,1));
+                   disp(aps_timedivision{poss(j,1),2});		  
+		   	
+                   disp('Check the variables used by the Offload manager:');
 
-		   fprintf('FINAL RESULT');
-		   fprintf('Time needed:');
-		   disp(t_total);
-		   fprintf('Energy needed:');
-		   e = poss(j,3) * bits;
-		   disp(e);
-				
-		   break;
+                   disp('t_resourceUL: ');
+                   disp(t_resourceUL);
+                   disp('tw_UL: ');
+                   disp(tw_UL);
+                   disp('t_resourceBUL: ');
+                   disp(t_resourceBUL);
+                   disp('tw_BUL: ')
+                   disp(tw_BUL);
+                   disp('tp_vm: ');
+                   disp(tp_vm);
+                   disp('t_resourceBDL: ');
+                   disp(t_resourceBDL);
+                   disp('tw_BDL: ');
+                   disp(tw_BDL);
+                   disp('t_resourceDL: ');
+                   disp(t_resourceDL);
+                   disp('tw_DL: ');
+                   disp(tw_DL);
+
+                   disp('FINAL RESULT');
+                   disp('Time needed:');
+                   disp(t_total);
+                   disp('Energy needed:');
+                   e = poss(j,3) * bits;
+                   disp(e);
+                   break;
+
+                else
+                    disp('Fail');
                 end 
             end
     end

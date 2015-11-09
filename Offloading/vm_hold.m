@@ -7,15 +7,25 @@ function twait = vm_hold(tcalc,vm, t_vm_arrival)
     twait=0;
     row = vm(1,:);
     ini = find(t_vm_arrival>row);
-    [row,column] = size(ini);
-    arrow = ini(column-1); 
-    
-    
+    [l,m] = size(ini);
+    if m==1 
+        arrow = ini(1,1); %first access
+    else
+        arrow = ini(1,m-1);
+    end
+
     if t_vm_arrival<vm(2,arrow)
         twait = vm(2,arrow)-t_vm_arrival;
         t_nextgap = vm(1,arrow+1)-vm(2,arrow);
-    else 
-        t_nextgap = vm(1,arrow+1)-t_vm_arrival;
+        if t_nextgap<0
+            t_nextgap=inf;
+        end
+    else
+        if m~=1
+            t_nextgap = vm(1,arrow+1)-t_vm_arrival;
+        else 
+            t_nextgap= inf;
+        end
     end
     
     if t_nextgap>=tcalc
@@ -27,8 +37,8 @@ function twait = vm_hold(tcalc,vm, t_vm_arrival)
     
     while tcalc>0
         arrow=arrow+1;
-        if arrow == column
-            twait= inf;
+        if arrow >= m-1
+            twait=twait+(vm(2,arrow)-vm(1,arrow));
             break;
         end
         t_nextgap = vm(1,arrow+1)-vm(2,arrow);

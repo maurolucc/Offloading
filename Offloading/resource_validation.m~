@@ -9,11 +9,7 @@ function res = resource_validation(tresource,resource,t_instant)
     [l1,m1] = size(ini1);
     [l2,m2] = size(ini2);
     
-    if m==1 
-        new =[t_instant;t_instant+tresource];
-        res = [new res];
-        return;
-    elseif m1==1
+    if m1==1 
         arrow = ini1(1,1);
     else
         arrow = ini1(1,m1-1);
@@ -33,6 +29,7 @@ function res = resource_validation(tresource,resource,t_instant)
      else
          res(1,1)=t_instant;
          tresource = tresource - t_nextgap;
+         t_instant = resource(1,1);
          arrow = 1;
      end
      
@@ -40,10 +37,10 @@ function res = resource_validation(tresource,resource,t_instant)
     
     
     if t_instant<resource(2,arrow) 
+        
         t_nextgap = resource(1,arrow+1)-resource(2,arrow);
         if t_nextgap<0
             res(2,arrow)= res(2,arrow)+tresource;
-            tresource=0;
         else
             if t_nextgap<tresource
              res(2,arrow)= res(2,arrow+1);

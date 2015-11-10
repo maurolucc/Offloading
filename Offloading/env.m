@@ -80,8 +80,8 @@ for s=1:M
 end    
 
 
-simtime = 20; % simulation time
-requests = 10; % mean number of requests per user
+simtime = 120; % simulation time
+requests = 5; % mean number of requests per user
 request = event_generator(K,requests,simtime);
 
 % C. OFFLOADING MANAGEMENT
@@ -93,36 +93,31 @@ request = event_generator(K,requests,simtime);
 % Waiting: tw_UL, tw_DL, tw_BUL, tw_BDL
 % Processing: tp_ap, tp_vm   
 
-count = 0;
+rec = 1;
+[s,f]=size(request);
 
-    while count ~= size(request)
-        
-        count = count+1;
+    while rec ~= f
+        disp('**\*****/*****\*****/****\*****/*****\*****/****\*****/*****\*****/**');
+        disp(rec);
+        disp('**\*****/*****\*****/****\*****/*****\*****/****\*****/*****\*****/**');
         t_threshold = 10000000000; % we could modifify this value depending on a parameter... (e.g. app)
-        who_user= request(2,count);
-        bits= request(3,count);
+        who_user= request(2,rec);
+        bits= request(3,rec);
         poss = container{who_user};
        
             for j=1:size(poss)
-                
-                t_instant = request(1,count); % reset t_instant
+  
+                t_instant = request(1,rec); % reset t_instant
 
                 t_resourceUL = bits/R_UL(who_user,poss(j,1));
                 tw_UL = resource_availability(t_resourceUL,aps_timedivision{poss(j,1),1},t_instant);
                 t1 = t_instant;
                 
-%                 disp('tw_UL:');
-%                 disp(tw_UL);
-                
-                
                 t_instant = t_instant + tw_UL + t_resourceUL;
                 t_resourceBUL = bits/RB_UL(poss(j,1),poss(j,2));
                 t2 = t_instant;
                 tw_BUL = resource_availability(t_resourceBUL,vms_timedivision{poss(j,2),1},t_instant);
-                
-%                 disp('tw_BUL:');
-%                 disp(tw_BUL);
-                
+
                 t_instant = t_instant + tw_BUL+ t_resourceBUL; 
                 t_vm_arrival= t_instant + latencies(poss(j,1),poss(j,2));
                 t3 = t_vm_arrival;
@@ -132,33 +127,22 @@ count = 0;
                 tw_vm = resource_availability(t_VM_resource,vms_calc{poss(j,2)},t_vm_arrival);
                 tp_vm =  t_VM_resource + tw_vm;
                 %t_vm_arrival: time that arrive last bit to be able to process data
-   
-%                 disp('tw_vm:');
-%                 disp(tw_vm);
-%                 
-                
+
                 t_resourceBDL = bits/RB_DL(poss(j,1),poss(j,2)); 
                 t_instant = t_vm_arrival + tp_vm + latencies(poss(j,1),poss(j,2));
                 t4 = t_instant;
                 tw_BDL = resource_availability(t_resourceBDL,vms_timedivision{poss(j,2),2},t_instant); 
-                
-%                 disp('tw_BDL:');
-%                 disp(tw_BDL);
-                
+ 
                 t_instant= t_instant + tw_BDL + t_resourceBDL;
                 t_resourceDL = bits/R_DL(who_user,poss(j,1));
                 t5 = t_instant;
                 tw_DL = resource_availability(t_resourceDL,aps_timedivision{poss(j,1),2},t_instant);
                 t_total= t_resourceUL+tw_UL+t_resourceBUL+tw_BUL+tp_vm+t_resourceBDL+tw_BDL+t_resourceDL+tw_DL + 2*latencies(poss(j,1),poss(j,2));
-                
-%                 disp('tw_DL:');
-%                 disp(tw_DL);
-                
         
 % an other consideration, ap routing t_wait = 0 ;
-                 
+           
                 if t_total<=t_threshold
-		   
+                
                    disp('SUCCESS!!!');
                    disp('The user ');
                    disp(who_user);
@@ -194,7 +178,7 @@ count = 0;
                   
                     
                    disp('The user arrived at :');
-                   disp(request(1,count));
+                   disp(request(1,rec));
                    disp('The resources are now in these state after offloading validation...');
                
                    disp('UL resource'); 
@@ -240,14 +224,15 @@ count = 0;
                    disp('Energy needed:');
                    e = poss(j,3) * bits;
                    disp(e);
-                   
-                   disp('//////////////////////////////////////////////////////////////////////////////////');
+             
+                   disp('///////////////////////////////////////////////////////////////////////////////////////////');
                    break;
 
                 else
                     disp('Fail');
                 end 
             end
+            rec = rec+1;
     end
 
 

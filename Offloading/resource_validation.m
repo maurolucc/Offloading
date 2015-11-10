@@ -58,7 +58,7 @@ function res = resource_validation(tresource,resource,t_instant)
         end
     else 
         
-        if m~=1
+        if m~=1 && resource(2,arrow)~=0
             t_nextgap = resource(1,arrow+1)-t_instant;
             
             if t_nextgap<tresource 

@@ -80,7 +80,7 @@ for s=1:M
 end    
 
 
-simtime = 5; % simulation time
+simtime = 20; % simulation time
 requests = 10; % mean number of requests per user
 request = event_generator(K,requests,simtime);
 
@@ -240,6 +240,8 @@ count = 0;
                    disp('Energy needed:');
                    e = poss(j,3) * bits;
                    disp(e);
+                   
+                   disp('//////////////////////////////////////////////////////////////////////////////////');
                    break;
 
                 else

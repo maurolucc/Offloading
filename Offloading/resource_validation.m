@@ -20,22 +20,22 @@ function res = resource_validation(tresource,resource,t_instant)
     end
     
     if m2==m-1 % just in case arrives before any time frame booked
-     t_nextgap = resource(1,1) - t_instant;
-     
-     if t_nextgap>tresource
-         new = [t_instant;t_instant+tresource];
-         res = [new res];
-         return;
-         
-     elseif t_nextgap==tresource
-         res(1,1)=t_instant;
-         return;
-     else
-         res(1,1)=t_instant;
-         tresource = tresource - t_nextgap;
-         arrow = 1;
-     end
-     
+
+         t_nextgap = resource(1,1) - t_instant;
+
+         if t_nextgap>tresource
+             new = [t_instant;t_instant+tresource];
+             res = [new res];
+             return;
+
+         elseif t_nextgap==tresource
+             res(1,1)=t_instant;
+             return;
+         else
+             res(1,1)=t_instant;
+             tresource = tresource - t_nextgap;
+             arrow = 1;
+         end
     end
     
     
@@ -60,10 +60,15 @@ function res = resource_validation(tresource,resource,t_instant)
         
         if m~=1
             t_nextgap = resource(1,arrow+1)-t_instant;
-            if t_nextgap<tresource
+            
+            if t_nextgap<tresource 
              res(1,arrow+1) = t_instant;
-             tresource=tresource-t_nextgap;
-
+             if t_nextgap>0  
+                tresource=tresource-t_nextgap;
+             else
+                res(2,arrow+1)=t_instant+tresource;
+                tresource=0; 
+             end
             elseif t_nextgap==tresource
                 res(1,arrow+1) = t_instant;
                 tresource=0;
@@ -111,19 +116,21 @@ function res = resource_validation(tresource,resource,t_instant)
    
     % clean outdated columns
     [q,w]= size(res);
-    last_column = res(:,w);
+    %last_column = res(:,w);
     
     for i=1:(w-1)
+        if res(:,i)~=0
             if res(1,i+1)<res(2,i) && res(2,i+1)<=res(2,i)
                 res(:,i+1)=[];
             elseif (res(1,i+1)<res(2,i) && res(2,i+1)>res(2,i)) || res(1,i+1)==res(2,i) 
                 res(2,i)=res(2,i+1);
                 res(:,i+1)=[];
             end
+        end
     end
     
-    if last_column~=0
+  % if last_column~=0
         z=[0;0];
         res=[res z];
-    end
+    %end
 end

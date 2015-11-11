@@ -100,10 +100,10 @@ function res = resource_validation(tresource,resource,t_instant)
         else
             t_nextgap = resource(1,arrow+1)-resource(2,arrow);
 
-            if t_nextgap<tresource && arrow ~= (column-1)
-                 tresource=tresource-tgap;
+            if t_nextgap<tresource && arrow ~= (m1-1)
+                 tresource=tresource-t_nextgap;
                  res(2,arrow)=res(2,arrow+1);
-            elseif t_nextgap==tresource && arrow ~= (column-1)
+            elseif t_nextgap==tresource && arrow ~= (m1-1)
                   res(2,arrow)=res(2,arrow+1);
                   tresource=0;
             else
@@ -116,21 +116,26 @@ function res = resource_validation(tresource,resource,t_instant)
    
     % clean outdated columns
     [q,w]= size(res);
-    %last_column = res(:,w);
+    last_column = res(:,w);
     
     for i=1:(w-1)
-        if res(:,i)~=0
-            if res(1,i+1)<res(2,i) && res(2,i+1)<=res(2,i)
-                res(:,i+1)=[];
-            elseif (res(1,i+1)<res(2,i) && res(2,i+1)>res(2,i)) || res(1,i+1)==res(2,i) 
-                res(2,i)=res(2,i+1);
-                res(:,i+1)=[];
+    [q2,w2]= size(res);
+        if w2<=i
+            if res(:,i)~=0
+                if res(1,i+1)<res(2,i) && res(2,i+1)<=res(2,i)
+                    res(:,i+1)=[];
+                elseif (res(1,i+1)<res(2,i) && res(2,i+1)>res(2,i)) || res(1,i+1)==res(2,i) 
+                    res(2,i)=res(2,i+1);
+                    res(:,i+1)=[];
+                end
             end
+        else
+            break;
         end
     end
     
-  % if last_column~=0
+  if last_column~=0
         z=[0;0];
         res=[res z];
-    %end
+  end
 end

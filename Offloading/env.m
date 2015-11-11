@@ -80,8 +80,8 @@ for s=1:M
 end    
 
 
-simtime = 120; % simulation time
-requests = 5; % mean number of requests per user
+simtime = 2; % simulation time
+requests = 2; % mean number of requests per user
 request = event_generator(K,requests,simtime);
 
 % C. OFFLOADING MANAGEMENT
@@ -178,7 +178,7 @@ rec = 1;
                   
                     
                    disp('The user arrived at :');
-                   disp(request(1,rec));
+                   disp(t1);
                    disp('The resources are now in these state after offloading validation...');
                
                    disp('UL resource'); 

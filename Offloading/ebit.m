@@ -13,7 +13,6 @@ function e_bit=ebit(rul,rdl)
     pul= ktx1 + ktx2*Ptx;
     pdl= krx1 + krx2*rdl;
     
-    %%%%%%%%% EEEEEEPPP
-    % e_bit= (pul/rul)+(pdl/rdl);
-    e_bit = pul/rul;
+    
+    e_bit= (pul/rul)+(pdl/rdl);
 end

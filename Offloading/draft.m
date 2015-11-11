@@ -68,14 +68,19 @@
 % 
 % disp(aps{2,2});
 
-res = [22 55 58 0;30 56 89 0];
-row = res(1,:);
-disp(row);
-ini = find(57>row);
-disp(ini);
-[l,m] = size(ini);
-disp(m);
+ res = [22 55 58 0;30 56 89 0];
+% row = res(1,:);
+% disp(row);
+% ini = find(57>row);
+% disp(ini);
+% [l,m] = size(ini);
+% disp(m);
+% 
+%         arrow = ini(1,m-1);
+%    
+% fileID = fopen('exp.txt','w');
+% fprintf(fileID,'%6s %12s\n','x','exp(x)');
+% fprintf(fileID,'%6.2f %12.8f\n',res);
+% fclose(fileID);
 
-        arrow = ini(1,m-1);
-   
-disp(arrow,'hola');
+

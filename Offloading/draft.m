@@ -68,7 +68,7 @@
 % 
 % disp(aps{2,2});
 
- res = [22 55 58 0;30 56 89 0];
+%  res = [22 55 58 0;30 56 89 0];
 % row = res(1,:);
 % disp(row);
 % ini = find(57>row);
@@ -83,4 +83,18 @@
 % fprintf(fileID,'%6.2f %12.8f\n',res);
 % fclose(fileID);
 
-
+ res = [3;3;4;4;4;5;5;5;5;5;5;7;7;7;7;7;8;8;10];
+ k= getblocks_ebit(res);
+ disp(k);
+% 
+% disp(sum(res));
+%         best_option = res(1,1);
+%         var = sum(res==best_option);
+%         disp(var);
+    
+% 
+% temps= [1.5, 5.6, 8.4, 0.9];
+% 
+% [M,I] = min(temps); 
+% disp(M),
+% disp(I);

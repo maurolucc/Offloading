@@ -14,5 +14,6 @@ function e_bit=ebit(rul,rdl)
     pdl= krx1 + krx2*rdl;
     
     
-    e_bit= (pul/rul)+(pdl/rdl);
+   % e_bit= (pul/rul)+(pdl/rdl);
+    e_bit= pul/rul; % provoking different e/bit solution
 end

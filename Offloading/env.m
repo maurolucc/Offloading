@@ -83,10 +83,17 @@ request = event_generator(K,requests,simtime);
 % Waiting: tw_UL, tw_DL, tw_BUL, tw_BDL
 % Processing: tp_ap, tp_vm   
 
-rec = 1;
+% There will be many options with the same E/bit. Therefore, it seems 
+% logical not choosing the first preconfigured option among the ones that
+% have the same E/bit. The best option in terms of time consuming will be
+% chosen among the ones that have the same E/bit characterization.
+
+
+rec = 0;
 [s,f]=size(request);
 
     while rec ~= f
+         rec = rec+1;
          disp('***********************************************************************************************');
          disp('                         REQUEST:'); fprintf('\b'); disp(rec);
          disp('***********************************************************************************************');
@@ -95,43 +102,79 @@ rec = 1;
         who_user= request(2,rec);
         bits= request(3,rec);
         poss = container{who_user};
-       
+        
+        ebit_blocks= getblocks_ebit(poss(:,3));
+        [h1, h2] = size(ebit_blocks);
+        
+        for x=1:h2
+        % The comparisions are done as many times as the same  e/bit is repeated in different possibilites
+        % and the previous combinations failed.
+            t_totals = Inf(1,ebit_blocks(1,x));
+            % this vector will be fullfilled with the t_total's calculated
+            % in order to be able to compare.
+            register=1;
             for j=1:size(poss)
-  
-                t_instant = request(1,rec); % reset t_instant
-
-                t_resourceUL = bits/R_UL(who_user,poss(j,1));
-                tw_UL = resource_availability(t_resourceUL,aps_timedivision{poss(j,1),1},t_instant);
-                t1 = t_instant;
+                j=register;
                 
-                t_instant = t_instant + tw_UL + t_resourceUL;
-                t_resourceBUL = bits/RB_UL(poss(j,1),poss(j,2));
-                t2 = t_instant;
-                tw_BUL = resource_availability(t_resourceBUL,vms_timedivision{poss(j,2),1},t_instant);
+                for y=1:ebit_blocks(1,x)
+                
+                    t_instant = request(1,rec); % reset t_instant
 
-                t_instant = t_instant + tw_BUL+ t_resourceBUL; 
-                t_vm_arrival= t_instant + latencies(poss(j,1),poss(j,2));
-                t3 = t_vm_arrival;
-               % rate = 10; % pending to specify rate
-               % t_VM_resource = bits/rate; % pending to specify rate
-               % depending on VM in use
-                t_VM_resource = 4;
-                tw_vm = resource_availability(t_VM_resource,vms_calc{poss(j,2)},t_vm_arrival);
-                tp_vm =  t_VM_resource + tw_vm;
-                %t_vm_arrival: time that arrive last bit to be able to process data
+                    t_resourceUL = bits/R_UL(who_user,poss(j,1));
+                    tw_UL = resource_availability(t_resourceUL,aps_timedivision{poss(j,1),1},t_instant);
+                    t1 = t_instant;
 
-                t_resourceBDL = bits/RB_DL(poss(j,1),poss(j,2)); 
-                t_instant = t_vm_arrival + tp_vm + latencies(poss(j,1),poss(j,2));
-                t4 = t_instant;
-                tw_BDL = resource_availability(t_resourceBDL,vms_timedivision{poss(j,2),2},t_instant); 
- 
-                t_instant= t_instant + tw_BDL + t_resourceBDL;
-                t_resourceDL = bits/R_DL(who_user,poss(j,1));
-                t5 = t_instant;
-                tw_DL = resource_availability(t_resourceDL,aps_timedivision{poss(j,1),2},t_instant);
-                t_total= t_resourceUL+tw_UL+t_resourceBUL+tw_BUL+tp_vm+t_resourceBDL+tw_BDL+t_resourceDL+tw_DL + 2*latencies(poss(j,1),poss(j,2));
-           
-                if t_total<=t_threshold
+                    t_instant = t_instant + tw_UL + t_resourceUL;
+                    t_resourceBUL = bits/RB_UL(poss(j,1),poss(j,2));
+                    t2 = t_instant;
+                    tw_BUL = resource_availability(t_resourceBUL,vms_timedivision{poss(j,2),1},t_instant);
+
+                    t_instant = t_instant + tw_BUL+ t_resourceBUL; 
+                    t_vm_arrival= t_instant + latencies(poss(j,1),poss(j,2));
+                    t3 = t_vm_arrival;
+                    % rate = 10; % pending to specify rate
+                    % t_VM_resource = bits/rate; % pending to specify rate
+                    % depending on VM in use
+                    t_VM_resource = 4;
+                    tw_vm = resource_availability(t_VM_resource,vms_calc{poss(j,2)},t_vm_arrival);
+                    tp_vm =  t_VM_resource + tw_vm;
+                    %t_vm_arrival: time that arrive last bit to be able to process data
+
+                    t_resourceBDL = bits/RB_DL(poss(j,1),poss(j,2)); 
+                    t_instant = t_vm_arrival + tp_vm + latencies(poss(j,1),poss(j,2));
+                    t4 = t_instant;
+                    tw_BDL = resource_availability(t_resourceBDL,vms_timedivision{poss(j,2),2},t_instant); 
+
+                    t_instant= t_instant + tw_BDL + t_resourceBDL;
+                    t_resourceDL = bits/R_DL(who_user,poss(j,1));
+                    t5 = t_instant;
+                    tw_DL = resource_availability(t_resourceDL,aps_timedivision{poss(j,1),2},t_instant);
+                    t_total= t_resourceUL+tw_UL+t_resourceBUL+tw_BUL+tp_vm+t_resourceBDL+tw_BDL+t_resourceDL+tw_DL + 2*latencies(poss(j,1),poss(j,2));
+
+                    t_totals(1,y)= t_total;
+                    j= j+1;
+                end 
+                
+                j=register;
+                
+                [M,I] = min(t_totals); 
+                t_total = M;
+                % choose the best option in terms of time (for those options that have the same e/bit)
+                
+                if x==1 % set the respective possibility
+                    j=I;
+                    register;
+                else
+                    j=0; 
+                    for aux=1:x-1
+                        j=j+ebit_blocks(1,aux);
+                    end
+                    j=j+I;
+                    register=j;
+                end
+                
+                if t_total<=t_threshold 
+                    % Success!=> Validation
                    disp('<><><><><><><><><><><><><><><><><><>SUCCESS<><><><><><><><><><><><><><><><><><><><><><><><><>');
                    disp('The user '); fprintf('\b');
                    disp(who_user);fprintf('\b'); 
@@ -156,7 +199,6 @@ rec = 1;
                    disp(poss(j,1));
                    disp(aps_timedivision{poss(j,1),2});	 
 		   
-                    % Success!=> Validation
                    aps_timedivision{poss(j,1),1} = resource_validation(t_resourceUL,aps_timedivision{poss(j,1),1},t1);
                    vms_timedivision{poss(j,2),1} = resource_validation(t_resourceBUL,vms_timedivision{poss(j,2),1},t2);
                    vms_calc{poss(j,2)}= resource_validation(t_VM_resource,vms_calc{poss(j,2)},t3); 
@@ -217,9 +259,11 @@ rec = 1;
                    disp(e);
              
                    disp('<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>');
+                   br_flag = true;
                    break;
 
                 else
+                   
                    disp('--------------------------------------------FAIL----------------------------------------------');
                    disp('The user '); fprintf('\b');
                    disp(who_user);fprintf('\b'); 
@@ -255,9 +299,26 @@ rec = 1;
                    disp('tw_DL:');fprintf('\b');
                    disp(tw_DL);
                    disp('----------------------------------------------------------------------------------------------');
-                end 
+                   
+                   b_flag=true;
+                   if x==h2 
+                    br_flag=true;
+                   else 
+                    br_flag=false;
+                   end
+                end
+                
+                if b_flag==true
+                    break;
+                end
+                if br_flag==true
+                    break;
+                end
             end
-            rec = rec+1;
+            if br_flag==true
+                    break;
+            end
+        end   
     end
 
 

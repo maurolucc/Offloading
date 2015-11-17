@@ -14,14 +14,26 @@ function rates_Bassignment=rates_Bassignment(technologies)
         for j=1:c
             tech = technologies(i,j);
             if tech==1
-                rate = randi ([10000000 10000000000],1);
+                rate = randi ([0 10000000000],1);
+                if rate<1000000000 % if the connection rate is very low... 
+                    rate=0; % disconnect
+                end
             elseif tech==2
-                rate = randi ([100000000 1000000000],1);    
+                rate = randi ([0 1000000000],1); 
+                if rate<100000000 % if the connection rate is very low...
+                    rate=0; % disconnect
+                end
             elseif tech==3
-                rate = randi ([500000000 10000000000],1);   
+                rate = randi ([0 10000000000],1);
+                if rate<500000000 % if the connection rate is very low...
+                    rate=0; % disconnect
+                end
             else 
-                rate = randi ([100000000 1000000000],1);   
-            end    
+                rate = randi ([0 1000000000],1);
+                if rate<100000000 % if the connection rate is very low... 
+                    rate=0; % disconnect
+                end
+            end      
             rates_Bassignment(i,j) = rate;
         end    
     end 

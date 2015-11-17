@@ -83,9 +83,9 @@
 % fprintf(fileID,'%6.2f %12.8f\n',res);
 % fclose(fileID);
 
- res = [3;3;4;4;4;5;5;5;5;5;5;7;7;7;7;7;8;8;10];
- k= getblocks_ebit(res);
- disp(k);
+%  res = [3;3;4;4;4;5;5;5;5;5;5;7;7;7;7;7;8;8;10];
+%  k= getblocks_ebit(res);
+%  disp(k);
 % 
 % disp(sum(res));
 %         best_option = res(1,1);
@@ -98,3 +98,33 @@
 % [M,I] = min(temps); 
 % disp(M),
 % disp(I);
+
+ for i=1:4
+        for j=1:4
+            tech = 1;
+            if tech==1
+                rate = randi ([0 10000000000],1);
+                if rate<1000000000 % if the connection is unreal... disconnect
+                    rate=0;
+                end
+            elseif tech==2
+                rate = randi ([0 1000000000],1); 
+                if rate<100000000 % if the connection is unreal... disconnect
+                    rate=0;
+                end
+            elseif tech==3
+                rate = randi ([0 10000000000],1);
+                if rate<500000000 % if the connection is unreal... disconnect
+                    rate=0;
+                end
+            else 
+                rate = randi ([0 1000000000],1);
+                if rate<100000000 % if the connection is unreal... disconnect
+                    rate=0;
+                end
+            end    
+            rates_Bassignment(i,j) = rate;
+        end    
+ end 
+    
+ disp(rates_Bassignment);

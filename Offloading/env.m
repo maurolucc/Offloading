@@ -23,9 +23,10 @@ RB_UL = rates_Bassignment(technologies);
 RB_DL = RB_UL; % Considering a symmetric backhaul link
 
 vms_location = vms_assignment(M);
-latencies = calculate_latency(technologies,vms_location);
+latencies = calculate_latency(technologies,vms_location(1,:));
 
 % Generate the connection possibilities for each user
+
 containter = {};
 for i=1:K
     possibilities = [];
@@ -132,10 +133,8 @@ rec = 0;
                     t_instant = t_instant + tw_BUL+ t_resourceBUL; 
                     t_vm_arrival= t_instant + latencies(poss(j,1),poss(j,2));
                     t3 = t_vm_arrival;
-                    % rate = 10; % pending to specify rate
-                    % t_VM_resource = bits/rate; % pending to specify rate
-                    % depending on VM in use
-                    t_VM_resource = 4;
+                    
+                    t_VM_resource = bits/vms_location(); % WIP
                     tw_vm = resource_availability(t_VM_resource,vms_calc{poss(j,2)},t_vm_arrival);
                     tp_vm =  t_VM_resource + tw_vm;
                     %t_vm_arrival: time that arrive last bit to be able to process data

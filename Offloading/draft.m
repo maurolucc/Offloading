@@ -13,7 +13,8 @@
 % pause(6);
 % disp(etime(clock,z));
 
-% A= [21 22 23 24 25 26 0; 27 28 29 210 211 212 0];
+A= [21 22 23 24 25 26 0; 27 28 29 210 211 212 0]
+    A= [A;inf] 
 % row = A(1,:);
 % ini = find(23.56>row);
 % [r,c] = size(ini);
@@ -98,33 +99,34 @@
 % [M,I] = min(temps); 
 % disp(M),
 % disp(I);
+% 
+%  for i=1:4
+%         for j=1:4
+%             tech = 1;
+%             if tech==1
+%                 rate = randi ([0 10000000000],1);
+%                 if rate<1000000000 % if the connection is unreal... disconnect
+%                     rate=0;
+%                 end
+%             elseif tech==2
+%                 rate = randi ([0 1000000000],1); 
+%                 if rate<100000000 % if the connection is unreal... disconnect
+%                     rate=0;
+%                 end
+%             elseif tech==3
+%                 rate = randi ([0 10000000000],1);
+%                 if rate<500000000 % if the connection is unreal... disconnect
+%                     rate=0;
+%                 end
+%             else 
+%                 rate = randi ([0 1000000000],1);
+%                 if rate<100000000 % if the connection is unreal... disconnect
+%                     rate=0;
+%                 end
+%             end    
+%             rates_Bassignment(i,j) = rate;
+%         end    
+%  end 
+%     
+%  disp(rates_Bassignment);
 
- for i=1:4
-        for j=1:4
-            tech = 1;
-            if tech==1
-                rate = randi ([0 10000000000],1);
-                if rate<1000000000 % if the connection is unreal... disconnect
-                    rate=0;
-                end
-            elseif tech==2
-                rate = randi ([0 1000000000],1); 
-                if rate<100000000 % if the connection is unreal... disconnect
-                    rate=0;
-                end
-            elseif tech==3
-                rate = randi ([0 10000000000],1);
-                if rate<500000000 % if the connection is unreal... disconnect
-                    rate=0;
-                end
-            else 
-                rate = randi ([0 1000000000],1);
-                if rate<100000000 % if the connection is unreal... disconnect
-                    rate=0;
-                end
-            end    
-            rates_Bassignment(i,j) = rate;
-        end    
- end 
-    
- disp(rates_Bassignment);

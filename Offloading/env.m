@@ -12,7 +12,8 @@ N = input(prompt1);
 prompt2 = 'Number of virtual machines: ';
 M = input(prompt2);
 
-R_UL = randi([1 16],K,N); 
+% Rates assignation 
+R_UL = randi([1 16],K,N);  
 R_UL = rates_assignment(R_UL);
 R_DL= randi([1 16],K,N); 
 R_DL = rates_assignment(R_DL);
@@ -44,6 +45,9 @@ for i=1:K
             end
         end    
     end  
+    possibilities(count,1)= N+1; % this index indicates running in local
+    possibilities(count,2)= M+1; % this index indicates running in local
+    possibilities(count,3)= 0.0206; % average value for mobile terminals
     possibilities = sortrows(possibilities,3); % order asc by energy
     container{i}=possibilities;
     % the possibilities matrix for the user i is allocated in container {i} 
@@ -54,14 +58,21 @@ end
 ti = 0;   
 tf = 0;  
 
+% Mobile terminals
+
+mts_timedivison = {}; % {i} refers to mobile terminal i
+for w=1:K
+    mts_timedivision{w} = [ti;tf]; % local
+end  
+
 % Access radio channels
 aps_timedivison = {}; % {i} refers to AP i
-for t=1:N 
+for t=1:(N+1) 
     aps_timedivision{t,1} = [ti;tf]; % UL
     aps_timedivision{t,2} = [ti;tf]; % DL
 end    
 
-% Backhaul radio channels and VM availability
+% Backhaul radio channels and virtual machines
 vms_timedivision = {}; % {i} refers to VM i 
 vms_calc = {};         % {i} refers to VM i 
 for s=1:M
@@ -69,7 +80,6 @@ for s=1:M
     vms_timedivision{s,2} = [ti;tf]; % DL
     vms_calc{s} = [ti;tf];
 end    
-
 
 simtime = 2; % simulation time
 requests = 2; % mean number of requests per user
@@ -89,38 +99,58 @@ request = event_generator(K,requests,simtime);
 % have the same E/bit. The best option in terms of time consuming will be
 % chosen among the ones that have the same E/bit characterization.
 
+% In case the possibility in study is local running, it will be directly
+% assigned since it will always meet the t_threshold condition and the
+% possible following options will be worse in terms of energy consumption.
 
 rec = 0;
 [s,f]=size(request);
 
-    while rec ~= f
-         rec = rec+1;
-         disp('***********************************************************************************************');
-         disp('                         REQUEST:'); fprintf('\b'); disp(rec);
-         disp('***********************************************************************************************');
+log_threshold = 0;
 
-        t_threshold = 30; % TODO: modifify this value depending on a parameter... (e.g. app)
+    while rec ~= f % until the buffer of requests is not empty
+        rec = rec+1;
+        disp('***********************************************************************************************');
+        disp('                         REQUEST:'); fprintf('\b'); disp(rec);
+        disp('***********************************************************************************************');
+
         who_user= request(2,rec);
         bits= request(3,rec);
+       % t_resourceMT = bits/rate_local(who_user); % local time execution
+        t_resourceMT = 4; % TODO: local values char
+        t_threshold = 1.25 *(resource_availability(t_resourceMT, mts_timedivision{who_user}, request(1,rec))); 
+        log_threshold = [log_threshold t_threshold];
+        % t_threshold is set for every request since the local resource
+        % could be busy and the criteria must consider this option.
         poss = container{who_user};
         
-        ebit_blocks= getblocks_ebit(poss(:,3));
+        ebit_blocks= getblocks_ebit(poss(:,3)); % group by energy/bit
         [h1, h2] = size(ebit_blocks);
         
-        for x=1:h2
+        for x=1:h2 
+        % Loop for each energy block
         % The comparisions are done as many times as the same  e/bit is repeated in different possibilites
         % and the previous combinations failed.
             t_totals = Inf(1,ebit_blocks(1,x));
-            % this vector will be fullfilled with the t_total's calculated
-            % in order to be able to compare.
+            
+            % This vector will be fullfilled with the t_total's calculated
+            % in order to be able to compare among the possibilities with
+            % the same energy/bit.
+            
             register=1;
-            for j=1:size(poss)
+            
+            for j=1:size(poss) 
                 j=register;
                 
                 for y=1:ebit_blocks(1,x)
+                % Loop for each possibility with the same energy/bit
                 
                     t_instant = request(1,rec); % reset t_instant
-
+              
+                    if poss(j,1)== N+1 && poss(j,2)== M+1 
+                        break;
+                    end
+                    
                     t_resourceUL = bits/R_UL(who_user,poss(j,1));
                     tw_UL = resource_availability(t_resourceUL,aps_timedivision{poss(j,1),1},t_instant);
                     t1 = t_instant;
@@ -134,7 +164,7 @@ rec = 0;
                     t_vm_arrival= t_instant + latencies(poss(j,1),poss(j,2));
                     t3 = t_vm_arrival;
                     
-                    t_VM_resource = bits/vms_location(); % WIP
+                    t_VM_resource = bits/vms_location(2,poss(j,2)); 
                     tw_vm = resource_availability(t_VM_resource,vms_calc{poss(j,2)},t_vm_arrival);
                     tp_vm =  t_VM_resource + tw_vm;
                     %t_vm_arrival: time that arrive last bit to be able to process data
@@ -154,15 +184,12 @@ rec = 0;
                     j= j+1;
                 end 
                 
-                j=register;
-                
-                [M,I] = min(t_totals); 
-                t_total = M;
+                [minim,I] = min(t_totals); 
+                t_total = minim;
                 % choose the best option in terms of time (for those options that have the same e/bit)
                 
                 if x==1 % set the respective possibility
                     j=I;
-                    register;
                 else
                     j=0; 
                     for aux=1:x-1
@@ -170,6 +197,18 @@ rec = 0;
                     end
                     j=j+I;
                     register=j;
+                end
+                
+                if poss(j,1)== N+1 && poss(j,2)== M+1 
+                    % Local running has been reached as the best option
+                    mts_timedivision{who_user} = resource_validation(t_resourceMT,mts_timedivision{who_user},request(1,rec));
+                    % It will always meet the condition t_threshold.
+                    % Consequently is directly assigned.
+                    disp('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
+                    disp('local');
+                    disp('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
+                    br_flag=true;
+                    break;
                 end
                 
                 if t_total<=t_threshold 
@@ -297,6 +336,9 @@ rec = 0;
                    disp(t_resourceDL);
                    disp('tw_DL:');fprintf('\b');
                    disp(tw_DL);
+                   
+                   disp('Time needed:');fprintf('\b');
+                   disp(t_total);
                    disp('----------------------------------------------------------------------------------------------');
                    
                    b_flag=true;

@@ -22,11 +22,14 @@ function vms_assignment=vms_assignment(M)
     %             cellstr('SYD'),17179];    SYDNEY
     
     % Distances APs-VMs
-    location = [0,30,620,1035,1486,1533,1828,2397,6489,7542,8330,9653,10053,10413,10875,17179]; 
-    rate = [0 0 0 0 0 0 0 0 0 0]; % Currently investigating for real parameters to simulate
+    % location = [0,30,620,1035,1486,1533,1828,2397,6489,7542,8330,9653,10053,10413,10875,17179];
+    
+    location = [0,30,1533,8330,17179]; % Choose a reduced set of vms locations for my analysis
+    rate = [1e6 1e7 1e8 1e9 1e10]; % TODO: charct remote exec
+    
     % At first the VMs in the scenario are located (KM). 
      for i=1:M
          vms_assignment(1,i)= randsample(location,1)*1000;
-         vms_assignment(2,i)= randsample(location,2);
+         vms_assignment(2,i)= randsample(rate,1);
      end
 end

@@ -11,6 +11,8 @@ prompt1 = 'Number of access points: ';
 N = input(prompt1);
 prompt2 = 'Number of virtual machines: ';
 M = input(prompt2);
+prompt3 = 'App kind (1 o 2):';
+app = input(prompt3);
 
 % Rates assignation 
 R_UL = randi([1 16],K,N);  
@@ -23,8 +25,10 @@ technologies = randi([1 6],N,M);
 RB_UL = rates_Bassignment(technologies); 
 RB_DL = RB_UL; % Considering a symmetric backhaul link
 
-vms_location = vms_assignment(M);
+vms_location = vms_assignment(M,app);
 latencies = calculate_latency(technologies,vms_location(1,:));
+
+mts_local_rates = mts_assignment(K,app);
 
 % Generate the connection possibilities for each user
 
@@ -52,6 +56,7 @@ for i=1:K
     container{i}=possibilities;
     % the possibilities matrix for the user i is allocated in container {i} 
 end
+
 
 % B. TIME FRAME CREATION
 
@@ -83,7 +88,7 @@ end
 
 simtime = 2; % simulation time
 requests = 2; % mean number of requests per user
-request = event_generator(K,requests,simtime);
+request = event_generator(K,requests,simtime,app);
 
 % C. OFFLOADING MANAGEMENT
 
@@ -116,10 +121,12 @@ log_threshold = 0;
 
         who_user= request(2,rec);
         bits= request(3,rec);
-       % t_resourceMT = bits/rate_local(who_user); % local time execution
-        t_resourceMT = 4; % TODO: local values char
-        t_threshold = 1.25 *(resource_availability(t_resourceMT, mts_timedivision{who_user}, request(1,rec))); 
-        log_threshold = [log_threshold t_threshold];
+        t_resourceMT = bits/ mts_local_rates(1,who_user); % local time execution
+        twp=resource_availability(t_resourceMT, mts_timedivision{who_user}, request(1,rec));
+        local_total = twp+t_resourceMT;
+        t_threshold = 1.25 * local_total; 
+        
+        log_threshold = [log_threshold t_threshold]; % just DEBUGGING!
         % t_threshold is set for every request since the local resource
         % could be busy and the criteria must consider this option.
         poss = container{who_user};
@@ -207,6 +214,14 @@ log_threshold = 0;
                     disp('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
                     disp('local');
                     disp('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
+                    disp('The user '); fprintf('\b');
+                    disp(who_user);fprintf('\b'); 
+                    disp(' has computed in local.');
+                    disp('The user needed ');fprintf('\b'); disp(local_total);
+                    disp('s tho have the process end.');
+                    disp('It was consumed '); fprintf('\b'); disp(0.0206*bits);
+                    disp('J');
+                    
                     br_flag=true;
                     break;
                 end
@@ -291,7 +306,7 @@ log_threshold = 0;
 
                    disp('FINAL RESULT');
                    disp('Time needed:');fprintf('\b');
-                   disp(t_total);
+                   disp(t_total);fprintf('\b'); disp('<'); disp(t_threshold);
                    disp('Energy needed:');fprintf('\b');
                    e = poss(j,3) * bits;
                    disp(e);
@@ -338,7 +353,7 @@ log_threshold = 0;
                    disp(tw_DL);
                    
                    disp('Time needed:');fprintf('\b');
-                   disp(t_total);
+                   disp(t_total); disp('>'); disp(t_threshold);
                    disp('----------------------------------------------------------------------------------------------');
                    
                    b_flag=true;

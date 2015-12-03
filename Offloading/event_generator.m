@@ -1,4 +1,4 @@
-function [events] = event_generator(Number_of_users,Offered_load,Simulation_time)
+function [events] = event_generator(Number_of_users,Offered_load,Simulation_time,app)
 %Olga Muñoz 19/09/2015
 %Mauro Lucchini 08/10/2015 (EXTRA)
 
@@ -49,9 +49,18 @@ who_user=b(index);
 ev=[arrival_times';who_user'];
 
 %EXTRA: DATA LOAD
+%In this section app_index is used so as to characterize the packages
+%depending on the app, the number of bits to offload will be more or less.
+
+if app==1
+load = 83886080; % set reasonable value
+elseif app==2  
+load = 83886080; % set reasonable value
+end
+
 
 [r,c] = size(ev);
-k = round(exprnd(83886080,[1,c])); % 83886080 bits = 10MB
+k = round(exprnd(load,[1,c]));
 for i=1:c
     if mod(k(1,i),8)~=0
         ans = round(k(1,i)/8);

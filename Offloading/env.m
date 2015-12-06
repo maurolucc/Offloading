@@ -57,7 +57,6 @@ for i=1:K
     % the possibilities matrix for the user i is allocated in container {i} 
 end
 
-
 % B. TIME FRAME CREATION
 
 ti = 0;   
@@ -86,7 +85,7 @@ for s=1:M
     vms_calc{s} = [ti;tf];
 end    
 
-simtime = 2; % simulation time
+simtime = 5; % simulation time
 requests = 2; % mean number of requests per user
 request = event_generator(K,requests,simtime,app);
 
@@ -110,6 +109,12 @@ request = event_generator(K,requests,simtime,app);
 
 rec = 0;
 [s,f]=size(request);
+
+RES_A = []; % MATRIX CONTAINS RESULTS FOR TEST A
+for ra=1:K
+  RES_A(ra,1)=0; % number of fails
+  RES_A(ra,2)=0; % number of success
+end
 
 log_threshold = 0;
 
@@ -221,6 +226,8 @@ log_threshold = 0;
                     disp('s tho have the process end.');
                     disp('It was consumed '); fprintf('\b'); disp(0.0206*bits);
                     disp('J');
+
+                    RES_A(who_user,1)= RES_A(who_user,1)+1;
                     
                     br_flag=true;
                     break;
@@ -310,7 +317,9 @@ log_threshold = 0;
                    disp('Energy needed:');fprintf('\b');
                    e = poss(j,3) * bits;
                    disp(e);
-             
+
+                   RES_A(who_user,2)= RES_A(who_user,2)+1;
+                   
                    disp('<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>');
                    br_flag = true;
                    break;

@@ -1,0 +1,11 @@
+TEST A
+
+This test shows the importance of mobile terminals computational power.
+
+HOW TO RUN TEST_A:
+
+- Run the simulator
+- users=1:1:K;
+- cpus = mts_local_rates(1,:);
+- offloads=transpose(RES_A(:,2));
+- [ax,b,p] = plotyy(users,offloads,users,cpus,'bar','stem');

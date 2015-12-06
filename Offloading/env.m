@@ -116,6 +116,14 @@ for ra=1:K
   RES_A(ra,2)=0; % number of success
 end
 
+RES_B = []; % MATRIX CONTAINS RESULTS FOR TEST B
+for rb=1:M
+  RES_B(rb,1)=vms_location(1,rb);
+  RES_B(rb,2)=latencies(1,rb);
+  RES_B(rb,3)=0;
+end
+
+
 log_threshold = 0;
 
     while rec ~= f % until the buffer of requests is not empty
@@ -319,6 +327,7 @@ log_threshold = 0;
                    disp(e);
 
                    RES_A(who_user,2)= RES_A(who_user,2)+1;
+                   RES_B(poss(j,2),3)= RES_B(poss(j,2),3)+1;
                    
                    disp('<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>');
                    br_flag = true;

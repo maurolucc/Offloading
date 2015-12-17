@@ -53,19 +53,19 @@ ev=[arrival_times';who_user'];
 %depending on the app, the number of bits to offload will be more or less.
 
 if app==1
-load = 83886080; % set reasonable value
+load = 500e5; % small packages (message)
 elseif app==2  
-load = 83886080; % set reasonable value
+load = 2.4e17; % huge packages (file)
 end
-
 
 [r,c] = size(ev);
 k = round(exprnd(load,[1,c]));
+
 for i=1:c
     if mod(k(1,i),8)~=0
         ans = round(k(1,i)/8);
         k(1,i)= k(1,i)- ans;
-    end    
+   end    
 end
 % bits
 % assign the correspondent data load to each request

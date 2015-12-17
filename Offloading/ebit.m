@@ -7,7 +7,7 @@ function e_bit=ebit(rul,rdl)
    
     Ptx= 0.1;   % Ptmax (W) Tx power
     ktx1= 0.4;  % W
-    ktx2= 18;   % W
+    ktx2= 18;   
     krx1= 0.4 ; % W
     krx2= 2.86 * 10e-6; % W/bps
     

@@ -20,7 +20,9 @@ R_UL = rates_assignment(R_UL);
 R_DL= randi([1 16],K,N); 
 R_DL = rates_assignment(R_DL);
 
-technologies = randi([1 6],N,M);
+% technologies = randi([1 6], N,M); 
+% TEST B
+technologies = ones(N,M);
 
 RB_UL = rates_Bassignment(technologies); 
 RB_DL = RB_UL; % Considering a symmetric backhaul link
@@ -51,7 +53,7 @@ for i=1:K
     end  
     possibilities(count,1)= N+1; % this index indicates running in local
     possibilities(count,2)= M+1; % this index indicates running in local
-    possibilities(count,3)= 0.0206; % average value for mobile terminals
+    possibilities(count,3)= 0.0206; % average value for mobile terminals (J/s)
     possibilities = sortrows(possibilities,3); % order asc by energy
     container{i}=possibilities;
     % the possibilities matrix for the user i is allocated in container {i} 
@@ -85,7 +87,7 @@ for s=1:M
     vms_calc{s} = [ti;tf];
 end    
 
-simtime = 5; % simulation time
+simtime = 30; % simulation time
 requests = 2; % mean number of requests per user
 request = event_generator(K,requests,simtime,app);
 
@@ -123,8 +125,16 @@ for rb=1:M
   RES_B(rb,3)=0;
 end
 
-
+RES_C = []; % MATRIX CONTAINS RESULTS FOR TEST C
+for rc=1:f
+   RES_C(rc,1)=0; 
+   RES_C(rc,2)=0;
+end
 log_threshold = 0;
+superlog = 0; 
+
+RES_D = []; % MATRIX CONTAINS RESULTS FOR TEST D
+
 
     while rec ~= f % until the buffer of requests is not empty
         rec = rec+1;
@@ -137,7 +147,7 @@ log_threshold = 0;
         t_resourceMT = bits/ mts_local_rates(1,who_user); % local time execution
         twp=resource_availability(t_resourceMT, mts_timedivision{who_user}, request(1,rec));
         local_total = twp+t_resourceMT;
-        t_threshold = 1.25 * local_total; 
+        t_threshold = 1.3 * local_total; 
         
         log_threshold = [log_threshold t_threshold]; % just DEBUGGING!
         % t_threshold is set for every request since the local resource
@@ -236,7 +246,9 @@ log_threshold = 0;
                     disp('J');
 
                     RES_A(who_user,1)= RES_A(who_user,1)+1;
-                    
+                    RES_C(rec,1)=0.0206*bits;
+                    RES_C(rec,2)=poss(j,3)*bits;
+                   
                     br_flag=true;
                     break;
                 end
@@ -328,8 +340,21 @@ log_threshold = 0;
 
                    RES_A(who_user,2)= RES_A(who_user,2)+1;
                    RES_B(poss(j,2),3)= RES_B(poss(j,2),3)+1;
-                   
+                   RES_C(rec,1)=0.0206*bits;
+                   RES_C(rec,2)=e;
                    disp('<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>');
+                   
+                   percentage = t_total/t_threshold;
+                   superlog = [superlog percentage];
+                   
+                   porfin= 0.0206*bits;
+                   porfin2= t_threshold/1.3;
+                   d_aux = porfin-e;
+                   t_weird= t_total-porfin2;
+                   d_aux_p = (d_aux/porfin)*100;
+                   t_weird_p = (t_weird/porfin2)*100;
+                   RES_D = [RES_D; d_aux t_weird_p];
+                   
                    br_flag = true;
                    break;
 
@@ -374,6 +399,9 @@ log_threshold = 0;
                    disp(t_total); disp('>'); disp(t_threshold);
                    disp('----------------------------------------------------------------------------------------------');
                    
+                   percentage = t_total/t_threshold;
+                   superlog = [superlog percentage];
+                   
                    b_flag=true;
                    if x==h2 
                     br_flag=true;
@@ -394,6 +422,8 @@ log_threshold = 0;
             end
         end   
     end
+    
+   
 
 
 

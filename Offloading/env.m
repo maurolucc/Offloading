@@ -14,15 +14,14 @@ M = input(prompt2);
 prompt3 = 'App kind (1 o 2):';
 app = input(prompt3);
 
+
 % Rates assignation 
 R_UL = randi([1 16],K,N);  
 R_UL = rates_assignment(R_UL);
 R_DL= randi([1 16],K,N); 
 R_DL = rates_assignment(R_DL);
 
-% technologies = randi([1 6], N,M); 
-% TEST B
-technologies = ones(N,M);
+technologies = randi([1 6], N,M); 
 
 RB_UL = rates_Bassignment(technologies); 
 RB_DL = RB_UL; % Considering a symmetric backhaul link

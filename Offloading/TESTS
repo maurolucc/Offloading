@@ -10,10 +10,10 @@ This test shows the importance of mobile terminals computational power.
 
 Check RES_A(:,1) to know the number of local runs for each mobile terminal.
 
-TEST B (KO)
+TEST B (OK) 
 
 This test shows the correlation of the number of cases that
-offload succeeds in a certaing virtual machine and the location and power
+offload succeeds in a certain virtual machine and the location and power
 of remote virtual machines.
 
 - Run the simulator
@@ -21,19 +21,18 @@ of remote virtual machines.
 
 3VM, 1AP, 1MT
 
-B.1 d1>d2>d3; C1=C2=C3
-B.2 d1>d2>d3; C1>C2>C3
+B.1 d1>d2>d3; C1=C2=C3 - OK
+B.2 d1>d2>d3; C1>C2>C3 - OK
 
 TEST C/D (KO)
 
-This test shows the number of cases that offload succeeds depending on the
-average/constant packages size.
+-
 
 
 TEST E (OK)
 
 This test shows the energy saving vs the extra time needed to offload.
 
-- r = sum(RES_A(:,2))
-- eje = transpose([1:r])
-- plotyy(eje,RES_D(:,1),eje,RES_D(:,2),'bar','stem')
+ r = sum(RES_A(:,2));
+ eje = transpose([1:r]);
+plotyy(eje,RES_D(:,1),eje,RES_D(:,2),'bar','stem')

@@ -24,12 +24,14 @@ function vms_assignment=vms_assignment(M,app_index)
     % Distances APs-VMs
     % location = [0,30,620,1035,1486,1533,1828,2397,6489,7542,8330,9653,10053,10413,10875,17179];
     
-    location = [0,30,1533,8330,17179]; % Choose a reduced set of vms locations for my analysis
-    rate = [6.76 2.88 2.77;10.4 4.43 4.26]; % TODO: charct remote exec
+    location = [30,1533]; % Choose a reduced set of vms locations for my analysis
+    rate = [2.77 4.43; 6.76 10.4]; % TODO: charct remote exec
 
     % At first the VMs in the scenario are located (KM). 
      for i=1:M
-         vms_assignment(1,i)= randsample(location,1)*1000;
-         vms_assignment(2,i)= randsample(rate(app_index,:),1)*10e6*8;
+        % vms_assignment(1,i)= randsample(location,1)*1000;
+        % vms_assignment(2,i)= randsample(rate(app_index,:),1)*10e6*8;
+        vms_assignment(1,i)= location(1,i);
+        vms_assignment(2,i)= rate(app_index,i)*10e6*8;
      end
 end

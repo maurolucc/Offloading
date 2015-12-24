@@ -24,9 +24,16 @@ of remote virtual machines.
 B.1 d1>d2>d3; C1=C2=C3 - OK
 B.2 d1>d2>d3; C1>C2>C3 - OK
 
-TEST C/D (KO)
+TEST C (OK)
 
--
+This test shows the importance of the complexity of the process to run. 
+
+5mts (different alpha), 1ap, 2vm
+
+- Run the simulator.
+- Inspect RES_A variable.
+
+TEST D (KO- FUTURE CHANGE)
 
 
 TEST E (OK)

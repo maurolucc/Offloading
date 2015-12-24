@@ -14,9 +14,9 @@ function rates_Bassignment=rates_Bassignment(technologies)
         for j=1:c
             tech = technologies(i,j);
             if tech==1
-                % rate = randi ([0 10000000000],1); 
+                 rate = randi ([0 10000000000],1); 
                 % TEST B
-                rate = 1000000000;
+               % rate = 1000000000;
                 if rate<1000000000 % if the connection rate is very low... 
                     rate=0; % disconnect
                 end

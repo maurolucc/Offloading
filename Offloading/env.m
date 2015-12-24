@@ -14,14 +14,14 @@ M = input(prompt2);
 prompt3 = 'App kind (1 o 2):';
 app = input(prompt3);
 
-
 % Rates assignation 
 R_UL = randi([1 16],K,N);  
 R_UL = rates_assignment(R_UL);
 R_DL= randi([1 16],K,N); 
 R_DL = rates_assignment(R_DL);
 
-technologies = randi([1 6], N,M); 
+% technologies = randi([1 6], N,M); 
+technologies = ones(1,M);
 
 RB_UL = rates_Bassignment(technologies); 
 RB_DL = RB_UL; % Considering a symmetric backhaul link
@@ -86,8 +86,8 @@ for s=1:M
     vms_calc{s} = [ti;tf];
 end    
 
-simtime = 30; % simulation time
-requests = 2; % mean number of requests per user
+simtime = 10; % simulation time
+requests = 30; % mean number of requests per user
 request = event_generator(K,requests,simtime,app);
 
 % C. OFFLOADING MANAGEMENT
@@ -124,16 +124,10 @@ for rb=1:M
   RES_B(rb,3)=0;
 end
 
-RES_C = []; % MATRIX CONTAINS RESULTS FOR TEST C
-for rc=1:f
-   RES_C(rc,1)=0; 
-   RES_C(rc,2)=0;
-end
-log_threshold = 0;
-superlog = 0; 
-
-RES_D = []; % MATRIX CONTAINS RESULTS FOR TEST D
-
+RES_C = zeros(f,2); % MATRIX CONTAINS RESULTS FOR TEST C
+RES_D = zeros(K,f);
+alpha = [1 1.5 2 2.5 3];
+log_who = [];
 
     while rec ~= f % until the buffer of requests is not empty
         rec = rec+1;
@@ -142,13 +136,14 @@ RES_D = []; % MATRIX CONTAINS RESULTS FOR TEST D
         disp('***********************************************************************************************');
 
         who_user= request(2,rec);
-        bits= request(3,rec);
+        
+        bits= request(3,rec)*alpha(1,who_user);
         t_resourceMT = bits/ mts_local_rates(1,who_user); % local time execution
         twp=resource_availability(t_resourceMT, mts_timedivision{who_user}, request(1,rec));
         local_total = twp+t_resourceMT;
-        t_threshold = 1.3 * local_total; 
+        t_threshold = 1.5 * local_total; 
         
-        log_threshold = [log_threshold t_threshold]; % just DEBUGGING!
+        
         % t_threshold is set for every request since the local resource
         % could be busy and the criteria must consider this option.
         poss = container{who_user};
@@ -245,9 +240,21 @@ RES_D = []; % MATRIX CONTAINS RESULTS FOR TEST D
                     disp('J');
 
                     RES_A(who_user,1)= RES_A(who_user,1)+1;
-                    RES_C(rec,1)=0.0206*bits;
-                    RES_C(rec,2)=poss(j,3)*bits;
-                   
+                    
+                    
+                   % RES_C(rec,1)=mts_local_rates(1,who_user);
+                    RES_C(rec,1)=who_user;
+                    RES_C(rec,2)=0.0206*bits;
+                    
+                    raro=1;
+                    while raro>0
+                        if RES_D(who_user,raro)==0
+                            RES_D(who_user,raro)=0.0206*bits;
+                            break;
+                        end 
+                        raro=raro+1;
+                    end
+                    
                     br_flag=true;
                     break;
                 end
@@ -339,12 +346,10 @@ RES_D = []; % MATRIX CONTAINS RESULTS FOR TEST D
 
                    RES_A(who_user,2)= RES_A(who_user,2)+1;
                    RES_B(poss(j,2),3)= RES_B(poss(j,2),3)+1;
-                   RES_C(rec,1)=0.0206*bits;
-                   RES_C(rec,2)=e;
+    
                    disp('<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>');
                    
                    percentage = t_total/t_threshold;
-                   superlog = [superlog percentage];
                    
                    porfin= 0.0206*bits;
                    porfin2= t_threshold/1.3;
@@ -352,7 +357,24 @@ RES_D = []; % MATRIX CONTAINS RESULTS FOR TEST D
                    t_weird= t_total-porfin2;
                    d_aux_p = (d_aux/porfin)*100;
                    t_weird_p = (t_weird/porfin2)*100;
-                   RES_D = [RES_D; d_aux t_weird_p];
+                 
+                   % TEST C
+                  % RES_C(rec,1)=mts_local_rates(1,who_user);
+                   RES_C(rec,1)= who_user;
+                   el= 0.0206*bits;
+                   eo= poss(j,3) * bits;
+                   RES_C(rec,2)= 100*(eo/el);
+                   
+                    raro=1;
+                    while raro>0
+                        if RES_D(who_user,raro)==0
+                            RES_D(who_user,raro)=0.0206*bits;
+                            break;
+                        end 
+                        raro=raro+1;
+                    end
+                   
+                    log_who= [log_who who_user];
                    
                    br_flag = true;
                    break;
@@ -397,9 +419,6 @@ RES_D = []; % MATRIX CONTAINS RESULTS FOR TEST D
                    disp('Time needed:');fprintf('\b');
                    disp(t_total); disp('>'); disp(t_threshold);
                    disp('----------------------------------------------------------------------------------------------');
-                   
-                   percentage = t_total/t_threshold;
-                   superlog = [superlog percentage];
                    
                    b_flag=true;
                    if x==h2 

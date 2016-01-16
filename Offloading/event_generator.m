@@ -1,6 +1,7 @@
 function [events] = event_generator(Number_of_users,Offered_load,Simulation_time,app)
-%Olga Muñoz 19/09/2015
-%Mauro Lucchini 08/10/2015 (EXTRA)
+
+% Olga Muñoz 19/09/2015
+% Mauro Lucchini 08/10/2015 (EXTRA)
 
 %INPUTS:
 % Number of users
@@ -59,14 +60,13 @@ load = 100;
 end
 
 [r,c] = size(ev);
-% k = round(exprnd(load,[1,c]));
-k=[];
+k = round(exprnd(load,[1,c]));
+
 for i=1:c
-%     if mod(k(1,i),8)~=0
-%         ans = round(k(1,i)/8);
-%         k(1,i)= k(1,i)- ans;
-%    end 
-k(1,i)=load;
+    if mod(k(1,i),8)~=0
+        ans = round(k(1,i)/8);
+        k(1,i)= k(1,i)- ans;
+   end 
 end
 % bits
 % assign the correspondent data load to each request

@@ -1,4 +1,7 @@
 function twait = resource_availability(tresource,resource,t_instant)
+ % This function returns possible waiting time in a resource (channel).
+ % The process can be fragmented.
+ 
     % tresource: time using the channel
     % resource: radio channel in use
     % t_instant: when this request is created 

@@ -1,5 +1,6 @@
 function e_bit=ebit(rul,rdl)
-
+% This function returns the energy consumed for tx/rx depending on UL & DL
+% communication rates.
     Ptx= 0.1;   % Ptmax (W) Tx power
     ktx1= 0.4;  % W
     ktx2= 18;   

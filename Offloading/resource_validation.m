@@ -1,10 +1,12 @@
 function res = resource_validation(tresource,resource,t_instant)
-% This function validates the new inputs
+% This function validates decisions. Status of the resource is updated and
+% returned.
+
 % tresource: time that the resource will be busy due to this request
 % resource: which resource will serve this request
 % t_instant: when this request arrives to this certain resource
 
-    res = resource; % I need the old and the new one this function will work with
+    res = resource; % old and new one must be preserved 
     row = resource(1,:); % all
     ini1 = find(t_instant>row); % major
     ini2 = find(t_instant<row); % menor

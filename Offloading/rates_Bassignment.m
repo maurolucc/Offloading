@@ -1,4 +1,7 @@
 function rates_Bassignment=rates_Bassignment(technologies)
+% This function returns the communication rates for the backhaul
+% for given technologies indexes previously created.
+
     % CATEGORIZATION OF NON_IDEAL BACKHAUL
     % The following technologies will be used for each connection.
     % index -> technology
@@ -15,8 +18,6 @@ function rates_Bassignment=rates_Bassignment(technologies)
             tech = technologies(i,j);
             if tech==1
                  rate = randi ([0 10000000000],1); 
-                % TEST B
-               % rate = 1000000000;
                 if rate<1000000000 % if the connection rate is very low... 
                     rate=0; % disconnect
                 end

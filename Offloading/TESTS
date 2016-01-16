@@ -33,7 +33,7 @@ This test shows the importance of the complexity of the process to run.
 - Run the simulator.
 - Inspect RES_A variable.
 
-TEST D (KO- FUTURE CHANGE)
+TEST D (OK)
 
 
 TEST E (OK)
@@ -42,4 +42,5 @@ This test shows the energy saving vs the extra time needed to offload.
 
  r = sum(RES_A(:,2));
  eje = transpose([1:r]);
-plotyy(eje,RES_D(:,1),eje,RES_D(:,2),'bar','stem')
+ plotyy(eje,RES_D(:,1),eje,RES_D(:,2),'bar','stem')
+

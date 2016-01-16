@@ -1,4 +1,6 @@
 function rates_assignment=rates_assignment(RateIndexMatrix)
+% This function returns the communication rates for given indexes
+% previously created.
 
     % MCS (Modulation and Coding Schemes)
     % Each value represent the number of information bits that can be
@@ -7,14 +9,7 @@ function rates_assignment=rates_assignment(RateIndexMatrix)
     % Although some terminals cannot transmit using certain modulations,
     % the MCS table is both used for uplink and downlink.
     
-   % MCS_Table=[0 0.1523 0.2344 0.3770 0.6016 0.8770 1.1758 1.4766 1.9141 2.4063 2.7305 3.3223 3.9023 4.5234 5.1152 5.5547];
-   
-   % TEST D
-   % - MCS_Table=[5.5547 5.5547 5.5547 5.5547 5.5547 5.5547 5.5547 5.5547 5.5547 5.5547 5.5547 5.5547 5.5547 5.5547 5.5547 5.5547];
-   % MCS_Table=[4.5234 4.5234 4.5234 4.5234 4.5234 4.5234 4.5234 4.5234 4.5234 4.5234 4.5234 4.5234 4.5234 4.5234 4.5234 4.5234]; 
-   % MCS_Table=[3.3223 3.3223 3.3223 3.3223 3.3223 3.3223 3.3223 3.3223 3.3223 3.3223 3.3223 3.3223 3.3223 3.3223 3.3223 3.3223];
-   MCS_Table=[2.7305 2.7305 2.7305 2.7305 2.7305 2.7305 2.7305 2.7305 2.7305 2.7305 2.7305 2.7305 2.7305 2.7305 2.7305 2.7305];
-   % MCS_Table=[0.6016 0.6016 0.6016 0.6016 0.6016 0.6016 0.6016 0.6016 0.6016 0.6016 0.6016 0.6016 0.6016 0.6016 0.6016 0.6016];
+    MCS_Table=[0 0.1523 0.2344 0.3770 0.6016 0.8770 1.1758 1.4766 1.9141 2.4063 2.7305 3.3223 3.9023 4.5234 5.1152 5.5547];
 
    [r,c] = size(RateIndexMatrix);
     for i=1:r
@@ -27,7 +22,7 @@ function rates_assignment=rates_assignment(RateIndexMatrix)
             % rest are used for control, synchronization,etc.
             MCS = MCS_Table(1,RateIndexMatrix(i,j));
             rate = MCS*84/0.5e-3*100*0.8895;
-            % Rate=MCS(bits)* 84REs/0.5ms * 100PRBs * 0.8895 (%data) 
+            % Rate = MCS(bits)* 84REs/0.5ms * 100PRBs * 0.8895 (%data) 
             rates_assignment(i,j)= rate;
         end    
     end    

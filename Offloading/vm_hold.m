@@ -1,4 +1,7 @@
 function twait = vm_hold(tcalc,vm, t_vm_arrival)
+ % This function returns possible waiting time in a resource (virtual machine).
+ % The process can not be fragmented (no multithreading).
+ 
     % vm: indicates which vm is requested
     % bits: amount to be processed
     % t_vm_arrival: when this request arrives to the vm (last bit)

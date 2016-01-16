@@ -53,9 +53,9 @@ ev=[arrival_times';who_user'];
 %depending on the app, the number of bits to offload will be more or less.
 
 if app==1
-load = 500e3; 
+load = 100; 
 elseif app==2  
-load = 500e3; 
+load = 100; 
 end
 
 [r,c] = size(ev);

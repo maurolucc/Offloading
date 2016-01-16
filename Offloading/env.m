@@ -13,6 +13,8 @@ prompt2 = 'Number of virtual machines: ';
 M = input(prompt2);
 prompt3 = 'App kind (1 o 2):';
 app = input(prompt3);
+prompt4 = 'lambda:';
+lambda = input(prompt4);
 
 % Rates assignation 
 R_UL = randi([1 16],K,N);  
@@ -52,7 +54,7 @@ for i=1:K
     end  
     possibilities(count,1)= N+1; % this index indicates running in local
     possibilities(count,2)= M+1; % this index indicates running in local
-    possibilities(count,3)= 0.0206; % average value for mobile terminals (J/s)
+    possibilities(count,3)= 0.004356; % average value for mobile terminals (J/s)
     possibilities = sortrows(possibilities,3); % order asc by energy
     container{i}=possibilities;
     % the possibilities matrix for the user i is allocated in container {i} 
@@ -87,7 +89,7 @@ for s=1:M
 end    
 
 simtime = 10; % simulation time
-requests = 30; % mean number of requests per user
+requests = lambda; % mean number of requests per user
 request = event_generator(K,requests,simtime,app);
 
 % C. OFFLOADING MANAGEMENT
@@ -124,10 +126,11 @@ for rb=1:M
   RES_B(rb,3)=0;
 end
 
-RES_C = zeros(f,2); % MATRIX CONTAINS RESULTS FOR TEST C
-RES_D = zeros(K,f);
-alpha = [1 1.5 2 2.5 3];
-log_who = [];
+
+RES_D = [];
+for rd=1:K
+  RES_D(rd,1)= 0;
+end
 
     while rec ~= f % until the buffer of requests is not empty
         rec = rec+1;
@@ -137,11 +140,11 @@ log_who = [];
 
         who_user= request(2,rec);
         
-        bits= request(3,rec)*alpha(1,who_user);
+        bits= request(3,rec);
         t_resourceMT = bits/ mts_local_rates(1,who_user); % local time execution
         twp=resource_availability(t_resourceMT, mts_timedivision{who_user}, request(1,rec));
         local_total = twp+t_resourceMT;
-        t_threshold = 1.5 * local_total; 
+        t_threshold = 0 * local_total; 
         
         
         % t_threshold is set for every request since the local resource
@@ -228,32 +231,19 @@ log_who = [];
                     mts_timedivision{who_user} = resource_validation(t_resourceMT,mts_timedivision{who_user},request(1,rec));
                     % It will always meet the condition t_threshold.
                     % Consequently is directly assigned.
-                    disp('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
-                    disp('local');
-                    disp('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
-                    disp('The user '); fprintf('\b');
-                    disp(who_user);fprintf('\b'); 
-                    disp(' has computed in local.');
-                    disp('The user needed ');fprintf('\b'); disp(local_total);
-                    disp('s tho have the process end.');
-                    disp('It was consumed '); fprintf('\b'); disp(0.0206*bits);
-                    disp('J');
+%                     disp('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
+%                     disp('local');
+%                     disp('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
+%                     disp('The user '); fprintf('\b');
+%                     disp(who_user);fprintf('\b'); 
+%                     disp(' has computed in local.');
+%                     disp('The user needed ');fprintf('\b'); disp(local_total);
+%                     disp('s tho have the process end.');
+%                     disp('It was consumed '); fprintf('\b'); disp(0.004356*bits);
+%                     disp('J');
 
                     RES_A(who_user,1)= RES_A(who_user,1)+1;
-                    
-                    
-                   % RES_C(rec,1)=mts_local_rates(1,who_user);
-                    RES_C(rec,1)=who_user;
-                    RES_C(rec,2)=0.0206*bits;
-                    
-                    raro=1;
-                    while raro>0
-                        if RES_D(who_user,raro)==0
-                            RES_D(who_user,raro)=0.0206*bits;
-                            break;
-                        end 
-                        raro=raro+1;
-                    end
+                    RES_D(who_user,1)= RES_D(who_user,1) + (0.004356*bits);
                     
                     br_flag=true;
                     break;
@@ -261,29 +251,29 @@ log_who = [];
                 
                 if t_total<=t_threshold 
                     % Success!=> Validation
-                   disp('<><><><><><><><><><><><><><><><><><>SUCCESS<><><><><><><><><><><><><><><><><><><><><><><><><>');
-                   disp('The user '); fprintf('\b');
-                   disp(who_user);fprintf('\b'); 
-                   disp(' has offloaded using AP '); fprintf('\b');
-                   disp(poss(j,1));fprintf('\b');
-                   disp(' and VM '); fprintf('\b');
-                   disp(poss(j,2));
-                
-                   disp('PREVIOUS UL resource'); 
-                   disp(poss(j,1));
-                   disp(aps_timedivision{poss(j,1),1});
-                   disp('PREVIOUS BUL resource');
-                   disp(poss(j,2));
-                   disp(vms_timedivision{poss(j,2),1});
-                   disp('PREVIOUS VM resource');
-                   disp(poss(j,2));
-                   disp(vms_calc{poss(j,2)});
-                   disp('PREVIOUS BDL resource');
-                   disp(poss(j,2));
-                   disp(vms_timedivision{poss(j,2),2});
-                   disp('PREVIOUS DL resource');
-                   disp(poss(j,1));
-                   disp(aps_timedivision{poss(j,1),2});	 
+%                    disp('<><><><><><><><><><><><><><><><><><>SUCCESS<><><><><><><><><><><><><><><><><><><><><><><><><>');
+%                    disp('The user '); fprintf('\b');
+%                    disp(who_user);fprintf('\b'); 
+%                    disp(' has offloaded using AP '); fprintf('\b');
+%                    disp(poss(j,1));fprintf('\b');
+%                    disp(' and VM '); fprintf('\b');
+%                    disp(poss(j,2));
+%                 
+%                    disp('PREVIOUS UL resource'); 
+%                    disp(poss(j,1));
+%                    disp(aps_timedivision{poss(j,1),1});
+%                    disp('PREVIOUS BUL resource');
+%                    disp(poss(j,2));
+%                    disp(vms_timedivision{poss(j,2),1});
+%                    disp('PREVIOUS VM resource');
+%                    disp(poss(j,2));
+%                    disp(vms_calc{poss(j,2)});
+%                    disp('PREVIOUS BDL resource');
+%                    disp(poss(j,2));
+%                    disp(vms_timedivision{poss(j,2),2});
+%                    disp('PREVIOUS DL resource');
+%                    disp(poss(j,1));
+%                    disp(aps_timedivision{poss(j,1),2});	 
 		   
                    aps_timedivision{poss(j,1),1} = resource_validation(t_resourceUL,aps_timedivision{poss(j,1),1},t1);
                    vms_timedivision{poss(j,2),1} = resource_validation(t_resourceBUL,vms_timedivision{poss(j,2),1},t2);
@@ -292,60 +282,62 @@ log_who = [];
                    aps_timedivision{poss(j,1),2} = resource_validation(t_resourceDL,aps_timedivision{poss(j,1),2},t5);
                   
                     
-                   disp('The user created a request (seconds):');fprintf('\b');
-                   disp(t1);
-                   disp('ACTUAL UL resource'); 
-                   disp(poss(j,1));
-                   disp(aps_timedivision{poss(j,1),1});
-                   disp('ACTUAL BUL resource');
-                   disp(poss(j,2));
-                   disp(vms_timedivision{poss(j,2),1});
-                   disp('ACTUAL VM resource');
-                   disp(poss(j,2));
-                   disp(vms_calc{poss(j,2)});
-                   disp('ACTUAL BDL resource');
-                   disp(poss(j,2));
-                   disp(vms_timedivision{poss(j,2),2});
-                   disp('ACTUAL DL resource');
-                   disp(poss(j,1));
-                   disp(aps_timedivision{poss(j,1),2});		  
-		   	
-                   disp('VARS:');
-
-                   disp('t_resourceUL:');fprintf('\b');
-                   disp(t_resourceUL);
-                   disp('tw_UL:');fprintf('\b');
-                   disp(tw_UL);
-                   disp('t_resourceBUL:');fprintf('\b');
-                   disp(t_resourceBUL);
-                   disp('tw_BUL:');fprintf('\b');
-                   disp(tw_BUL);
-                   disp('tw_vm:');fprintf('\b');
-                   disp(tw_vm);
-                   disp('t_VM_resource:');fprintf('\b');
-                   disp(t_VM_resource);
-                   disp('latency:');fprintf('\b');
-                   disp(latencies(poss(j,1),poss(j,2)));
-                   disp('tp_vm:');fprintf('\b');
-                   disp(tp_vm);
-                   disp('t_resourceBDL:');fprintf('\b');
-                   disp(t_resourceBDL);
-                   disp('tw_BDL:');fprintf('\b');
-                   disp(tw_BDL);
-                   disp('t_resourceDL:');fprintf('\b');
-                   disp(t_resourceDL);
-                   disp('tw_DL:');fprintf('\b');
-                   disp(tw_DL);
-
-                   disp('FINAL RESULT');
-                   disp('Time needed:');fprintf('\b');
-                   disp(t_total);fprintf('\b'); disp('<'); disp(t_threshold);
-                   disp('Energy needed:');fprintf('\b');
+%                    disp('The user created a request (seconds):');fprintf('\b');
+%                    disp(t1);
+%                    disp('ACTUAL UL resource'); 
+%                    disp(poss(j,1));
+%                    disp(aps_timedivision{poss(j,1),1});
+%                    disp('ACTUAL BUL resource');
+%                    disp(poss(j,2));
+%                    disp(vms_timedivision{poss(j,2),1});
+%                    disp('ACTUAL VM resource');
+%                    disp(poss(j,2));
+%                    disp(vms_calc{poss(j,2)});
+%                    disp('ACTUAL BDL resource');
+%                    disp(poss(j,2));
+%                    disp(vms_timedivision{poss(j,2),2});
+%                    disp('ACTUAL DL resource');
+%                    disp(poss(j,1));
+%                    disp(aps_timedivision{poss(j,1),2});		  
+% 		   	
+%                    disp('VARS:');
+% 
+%                    disp('t_resourceUL:');fprintf('\b');
+%                    disp(t_resourceUL);
+%                    disp('tw_UL:');fprintf('\b');
+%                    disp(tw_UL);
+%                    disp('t_resourceBUL:');fprintf('\b');
+%                    disp(t_resourceBUL);
+%                    disp('tw_BUL:');fprintf('\b');
+%                    disp(tw_BUL);
+%                    disp('tw_vm:');fprintf('\b');
+%                    disp(tw_vm);
+%                    disp('t_VM_resource:');fprintf('\b');
+%                    disp(t_VM_resource);
+%                    disp('latency:');fprintf('\b');
+%                    disp(latencies(poss(j,1),poss(j,2)));
+%                    disp('tp_vm:');fprintf('\b');
+%                    disp(tp_vm);
+%                    disp('t_resourceBDL:');fprintf('\b');
+%                    disp(t_resourceBDL);
+%                    disp('tw_BDL:');fprintf('\b');
+%                    disp(tw_BDL);
+%                    disp('t_resourceDL:');fprintf('\b');
+%                    disp(t_resourceDL);
+%                    disp('tw_DL:');fprintf('\b');
+%                    disp(tw_DL);
+% 
+%                    disp('FINAL RESULT');
+%                    disp('Time needed:');fprintf('\b');
+%                    disp(t_total);fprintf('\b'); disp('<'); disp(t_threshold);
+%                    disp('Energy needed:');fprintf('\b');
                    e = poss(j,3) * bits;
-                   disp(e);
+%                    disp(e);
 
                    RES_A(who_user,2)= RES_A(who_user,2)+1;
                    RES_B(poss(j,2),3)= RES_B(poss(j,2),3)+1;
+                   
+                   RES_D(who_user,1)=RES_D(who_user,1)+e;
     
                    disp('<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>');
                    
@@ -357,69 +349,51 @@ log_who = [];
                    t_weird= t_total-porfin2;
                    d_aux_p = (d_aux/porfin)*100;
                    t_weird_p = (t_weird/porfin2)*100;
-                 
-                   % TEST C
-                  % RES_C(rec,1)=mts_local_rates(1,who_user);
-                   RES_C(rec,1)= who_user;
-                   el= 0.0206*bits;
-                   eo= poss(j,3) * bits;
-                   RES_C(rec,2)= 100*(eo/el);
-                   
-                    raro=1;
-                    while raro>0
-                        if RES_D(who_user,raro)==0
-                            RES_D(who_user,raro)=0.0206*bits;
-                            break;
-                        end 
-                        raro=raro+1;
-                    end
-                   
-                    log_who= [log_who who_user];
-                   
+
                    br_flag = true;
                    break;
 
                 else
-                   
-                   disp('--------------------------------------------FAIL----------------------------------------------');
-                   disp('The user '); fprintf('\b');
-                   disp(who_user);fprintf('\b'); 
-                   disp(' could NOT offload using AP '); fprintf('\b');
-                   disp(poss(j,1));fprintf('\b');
-                   disp(' and VM '); fprintf('\b');
-                   disp(poss(j,2));
-                   
-                   disp('VARS:');
-
-                   disp('t_resourceUL:');fprintf('\b');
-                   disp(t_resourceUL);
-                   disp('tw_UL:');fprintf('\b');
-                   disp(tw_UL);
-                   disp('t_resourceBUL:');fprintf('\b');
-                   disp(t_resourceBUL);
-                   disp('tw_BUL:');fprintf('\b');
-                   disp(tw_BUL);
-                   disp('tw_vm:');fprintf('\b');
-                   disp(tw_vm);
-                   disp('t_VM_resource:');fprintf('\b');
-                   disp(t_VM_resource);
-                   disp('latency:');fprintf('\b');
-                   disp(latencies(poss(j,1),poss(j,2)));
-                   disp('tp_vm:');fprintf('\b');
-                   disp(tp_vm);
-                   disp('t_resourceBDL:');fprintf('\b');
-                   disp(t_resourceBDL);
-                   disp('tw_BDL:');fprintf('\b');
-                   disp(tw_BDL);
-                   disp('t_resourceDL:');fprintf('\b');
-                   disp(t_resourceDL);
-                   disp('tw_DL:');fprintf('\b');
-                   disp(tw_DL);
-                   
-                   disp('Time needed:');fprintf('\b');
-                   disp(t_total); disp('>'); disp(t_threshold);
-                   disp('----------------------------------------------------------------------------------------------');
-                   
+%                    
+%                    disp('--------------------------------------------FAIL----------------------------------------------');
+%                    disp('The user '); fprintf('\b');
+%                    disp(who_user);fprintf('\b'); 
+%                    disp(' could NOT offload using AP '); fprintf('\b');
+%                    disp(poss(j,1));fprintf('\b');
+%                    disp(' and VM '); fprintf('\b');
+%                    disp(poss(j,2));
+%                    
+%                    disp('VARS:');
+% 
+%                    disp('t_resourceUL:');fprintf('\b');
+%                    disp(t_resourceUL);
+%                    disp('tw_UL:');fprintf('\b');
+%                    disp(tw_UL);
+%                    disp('t_resourceBUL:');fprintf('\b');
+%                    disp(t_resourceBUL);
+%                    disp('tw_BUL:');fprintf('\b');
+%                    disp(tw_BUL);
+%                    disp('tw_vm:');fprintf('\b');
+%                    disp(tw_vm);
+%                    disp('t_VM_resource:');fprintf('\b');
+%                    disp(t_VM_resource);
+%                    disp('latency:');fprintf('\b');
+%                    disp(latencies(poss(j,1),poss(j,2)));
+%                    disp('tp_vm:');fprintf('\b');
+%                    disp(tp_vm);
+%                    disp('t_resourceBDL:');fprintf('\b');
+%                    disp(t_resourceBDL);
+%                    disp('tw_BDL:');fprintf('\b');
+%                    disp(tw_BDL);
+%                    disp('t_resourceDL:');fprintf('\b');
+%                    disp(t_resourceDL);
+%                    disp('tw_DL:');fprintf('\b');
+%                    disp(tw_DL);
+%                    
+%                    disp('Time needed:');fprintf('\b');
+%                    disp(t_total); disp('>'); disp(t_threshold);
+%                    disp('----------------------------------------------------------------------------------------------');
+%                    
                    b_flag=true;
                    if x==h2 
                     br_flag=true;

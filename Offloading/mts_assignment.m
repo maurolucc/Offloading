@@ -10,7 +10,7 @@ function mts_assignment = mts_assignment(M,app_index)
     
   % rates_app = [2.6 1.05 0.79 0.62 0.3;4 1.62 1.22 0.96 0.47]; % MB/s
     
-    rates_app = [0.3 0.3;4 4]; 
+    rates_app = [0.3 0.3;4 4];
     for i=1:M
        mts_assignment(1,i) = randsample(rates_app(app_index,:),1)*10e6*8; % b/s
        % mts_assignment(1,i) = rates_app(app_index,i);

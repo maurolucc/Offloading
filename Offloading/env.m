@@ -53,7 +53,7 @@ for i=1:K
     end  
     possibilities(count,1)= N+1; % this index indicates running in local
     possibilities(count,2)= M+1; % this index indicates running in local
-    possibilities(count,3)= 0.004356; % average value for mobile terminals (J/s)
+    possibilities(count,3)= 0.02066; % average value for mobile terminals (J/s)
     possibilities = sortrows(possibilities,3); % order asc by energy
     container{i}=possibilities;
     % the possibilities matrix for the user i is allocated in container {i} 
